@@ -1,0 +1,50 @@
+{%extends './base_generic.html' %}
+{%block content%}
+<nav>
+<div class='nav-wrapper'>
+<a href='#' class='brand-logo'>Placeholder</a>
+<ul id='nav-mobile' class='right hide-on-med-and-down'>
+<li><a href="/follow/"> Follow other people here! </a></li>
+<li>
+<a href="/logout/"> Logout here </a>
+</li><li>
+<a href = "/create/"> Make new posts here </a>
+</li>
+</ul>
+</div>
+</nav>
+<div class='container'>
+{% for eachpost in posts %}
+<div class='section'>
+<p style='font-family:Notable,sans-seriff;'> {{eachpost.title}} </p>
+<p style='font-family:Raleway,sans-seriff;'> {{eachpost.text}}</p>
+<blockquote style='font-family:Taviraj,seriff;font-size:smaller;'> by {{eachpost.author}} on {{eachpost.created_date}}<form action='' method='post'>
+{%csrf_token%}
+<button type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} likes</button></blockquote>
+</form>
+</div>
+<div class='divider'></div>
+{% for comment in comments%}
+{% if comment.post == eachpost%}
+<p> {{comment.text}} <span style='float:right;'>by {{comment.author}}</span> </p>
+
+{% endif %}
+{% endfor%}
+<form class = '' method='post'>
+{%csrf_token%}
+<div class='input-field'>
+<input id={{eachpost.id}} type='text' name='placeholder'>
+<label for={{eachpost.id}}> Comment here </label>
+</div>
+<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+</form>
+{% endfor %}
+</div>
+<h2> Following </h2>
+{% for follower in FOLLOWING%}
+<form action='' method='post'>
+{%csrf_token%}
+<input type="submit" name="follow" value={{follower}}></button>
+</form>
+{% endfor%}
+{%endblock%}

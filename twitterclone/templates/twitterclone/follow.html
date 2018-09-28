@@ -1,0 +1,13 @@
+{%block content%}
+
+<p> Simple follower implementation, click on the button to follow users </p>
+<div align=right>
+<a href ="../"> Home </a>
+</div>
+{%for eachuser in users %}
+<form action='' method="post">
+{%csrf_token%}
+<input type="submit" name="follow"  value={{eachuser.username}}>{{eachuser.username}}</button>
+</form>
+{%endfor%}
+{%endblock%}

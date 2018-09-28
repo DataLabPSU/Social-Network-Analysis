@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block title %}<title>Twitter clone</title>{% endblock %}
+</head>
+<body>
+  {% block sidebar %} <ul class="sidebar-nav">
+
+    <div align='right'>
+
+   {% if user.is_authenticated %}
+     <li>User: {{ user.get_username }}</li>
+     <li><a href="{% url 'home'%}">Home</a></li>
+     <li><a href="{% url 'logout'%}">Logout</a></li>   
+   {% else %}
+     <a href="{% url 'home'%}">Home</a>
+     <br><a href="{% url 'login'%}">Login</a></br>  
+   {% endif %} 
+  </ul>
+  </div>
+  {% endblock %}
+  {% block content %}<!-- default content text (typically empty) -->{% endblock %}
+</body>
+</html>

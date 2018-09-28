@@ -1,0 +1,100 @@
+from django.shortcuts import render,redirect,render_to_response,get_object_or_404
+from django.template import RequestContext
+from .models import Post,Comment
+from . import forms
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.contrib.auth import login,authenticate
+from django.contrib.auth.forms import UserCreationForm
+def home(request):
+	if request.user.is_authenticated:
+
+		if request.method == 'POST':
+			try:
+
+				user = User.objects.get(pk=request.user.id)
+				temp = user.profile.following.split(" ")
+				temp.remove(request.POST['follow'])
+				user.profile.following = ' '.join(temp)
+				user.save()
+			except:
+				try:
+					user = User.objects.get(pk=request.user.id)
+					post = Post.objects.get(pk=request.POST['unique'])
+					if post.author != user and request.POST['unique'] not in user.profile.liked:
+						post.likes += 1
+						post.save()
+						user.profile.liked = user.profile.liked +" " + request.POST['unique']			
+						user.save()
+					elif post.author != user and request.POST['unique'] in user.profile.liked:
+						temp = user.profile.liked.split(" ")
+						temp.remove(request.POST['unique'])
+						user.profile.liked = ' '.join(temp)
+						post.likes -= 1
+						post.save()
+						user.save()
+				except: 
+					comment = request.POST['placeholder']
+					newcomment = Comment.objects.create(author=request.user)
+					newcomment.post = Post.objects.get(pk=request.POST['submit'])
+					newcomment.text = comment
+					newcomment.save()			
+		user = User.objects.get(pk=request.user.id)
+		
+		posts = Post.objects.filter(author=request.user)
+		comments = Comment.objects.all()
+		if user.profile.following != "":	
+			for i in set(user.profile.following.split(" ")):
+				if i != "":
+					following = User.objects.get(username=i)
+					otherposts = Post.objects.filter(author=following)
+					posts = posts | otherposts
+		context = {
+		'posts':posts,
+		'comments':comments,
+		'FOLLOWING' : set(user.profile.following.split(" ")[1:]),
+		'test' : (user.profile.following.split(" ")),	
+	}
+
+		return render(request,"twitterclone/home.html",context)
+	else:
+		return redirect('login')
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'twitterclone/signup.html', {'form': form})
+
+
+def addpost(request):
+	if request.method == 'POST':
+		form = forms.PostForm(request.POST)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.author=request.user
+			instance.save()
+			return redirect('home')
+	else:
+		form = forms.PostForm()
+
+	return render(request,'twitterclone/create.html',{'form':form})
+
+def testfollow(request):
+	if request.method == 'POST':
+		user =  User.objects.get(pk=request.user.id)
+		user.profile.following = user.profile.following + " " +  request.POST['follow']
+		user.save()
+		
+	userlist = User.objects.exclude(pk=request.user.id)
+	context = {
+	'users':userlist
+	}
+	return render(request,'twitterclone/follow.html',context)		

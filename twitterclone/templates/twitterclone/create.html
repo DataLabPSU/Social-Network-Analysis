@@ -1,0 +1,11 @@
+{% block content %}
+{% if user.is_authenticated %}
+   <h2>Create Post </h2>
+   <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+   <button type="submit">Create Post </button>
+{% else%}
+<p> You need to be logged in to make a post!</p>
+{% endif%}
+{%endblock%}
