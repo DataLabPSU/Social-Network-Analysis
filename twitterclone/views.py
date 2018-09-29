@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,render_to_response,get_object_or_404
 from django.template import RequestContext
-from .models import Post,Comment
+from .models import Post,Comment,Share
 from . import forms
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -11,6 +11,19 @@ def home(request):
 
 		if request.method == 'POST':
 			try:
+				postid = request.POST['share']
+				post = Post.objects.get(id=postid)
+				if request.user != post.author:	
+					newshare = Share.objects.create(shared=request.user)
+					newshare.postid = postid
+					newshare.save()
+			except Exception as e:
+				print(str(e))
+				raise(e)
+	
+
+
+			try:
 
 				user = User.objects.get(pk=request.user.id)
 				temp = user.profile.following.split(" ")
@@ -18,30 +31,44 @@ def home(request):
 				user.profile.following = ' '.join(temp)
 				user.save()
 			except:
-				try:
-					user = User.objects.get(pk=request.user.id)
-					post = Post.objects.get(pk=request.POST['unique'])
-					if post.author != user and request.POST['unique'] not in user.profile.liked:
-						post.likes += 1
-						post.save()
-						user.profile.liked = user.profile.liked +" " + request.POST['unique']			
-						user.save()
-					elif post.author != user and request.POST['unique'] in user.profile.liked:
-						temp = user.profile.liked.split(" ")
-						temp.remove(request.POST['unique'])
-						user.profile.liked = ' '.join(temp)
-						post.likes -= 1
-						post.save()
-						user.save()
-				except: 
-					comment = request.POST['placeholder']
-					newcomment = Comment.objects.create(author=request.user)
-					newcomment.post = Post.objects.get(pk=request.POST['submit'])
-					newcomment.text = comment
-					newcomment.save()			
+				pass
+			try:
+				user = User.objects.get(pk=request.user.id)
+				post = Post.objects.get(pk=request.POST['unique'])
+				if post.author != user and request.POST['unique'] not in user.profile.liked:
+					post.likes += 1
+					post.save()
+					user.profile.liked = user.profile.liked +" " + request.POST['unique']			
+					user.save()
+				elif post.author != user and request.POST['unique'] in user.profile.liked:
+					temp = user.profile.liked.split(" ")
+					temp.remove(request.POST['unique'])
+					user.profile.liked = ' '.join(temp)
+					post.likes -= 1
+					post.save()
+					user.save()
+			except: 
+				pass
+			try:
+				comment = request.POST['placeholder']
+				newcomment = Comment.objects.create(author=request.user)
+				newcomment.post = Post.objects.get(pk=request.POST['submit'])
+				newcomment.text = comment
+				newcomment.save()
+			except:
+				pass			
 		user = User.objects.get(pk=request.user.id)
 		
 		posts = Post.objects.filter(author=request.user)
+		postlist = list(posts)
+		shares = Share.objects.filter(shared=request.user)
+		for z in shares:
+			content = Post.objects.get(id=z.postid)
+			content.author.username =content.author.username +  ', Shared by ' + z.shared.username
+			content.created_date = z.date
+			postlist.append(content)
+			print(postlist)
+			print(set(postlist))
 		comments = Comment.objects.all()
 		if user.profile.following != "":	
 			for i in set(user.profile.following.split(" ")):
@@ -49,8 +76,15 @@ def home(request):
 					following = User.objects.get(username=i)
 					otherposts = Post.objects.filter(author=following)
 					posts = posts | otherposts
+					postlist.extend(list(otherposts))
+					sharedposts = Share.objects.filter(shared=following)
+					for z in sharedposts:
+						content = Post.objects.get(id=z.postid)
+						content.author.username = content.author.username + ' Shared by ' + z.shared.username
+						content.created_date = z.date
+						postlist.append(content)
 		context = {
-		'posts':posts,
+		'posts':postlist,
 		'comments':comments,
 		'FOLLOWING' : set(user.profile.following.split(" ")[1:]),
 		'test' : (user.profile.following.split(" ")),	

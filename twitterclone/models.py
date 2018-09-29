@@ -24,7 +24,10 @@ class Post(models.Model):
 		self.save()
 	def __str__(self):
 		return self.title
-
+class Share(models.Model):
+	shared = models.ForeignKey(User,blank=True, null=True, on_delete=models.CASCADE)
+	postid = models.TextField()
+	date = models.DateTimeField(default=timezone.now)
 class Comment(models.Model):
 	post = models.ForeignKey(Post,blank=True, null=True, on_delete=models.CASCADE)
 	text = models.TextField()
