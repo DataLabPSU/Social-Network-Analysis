@@ -63,22 +63,37 @@
 			<input id={{eachpost.id}} type='text' name='placeholder'>
 			<label for={{eachpost.id}}> Comment here </label>
 		</div>
+
 		<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
-		</form>
-		{% endfor %}
-		</div>
-
-		</div>
-
-		<div class="col col-lg-2">
-		<h2> Following </h2>
-		{% for follower in FOLLOWING%}
-		<form action='' method='post'>
-		{%csrf_token%}
-		<input type="submit" name="follow" value={{follower}}></button>
-		</form>
-		{% endfor%}
-		{%endblock%}
+        </form>
+        {% endfor %}
+        </div>
+        <h2> Following </h2>
+        {% for follower in FOLLOWING%}
+        <form action='' method='post'>
+        {%csrf_token%}
+        <input type="submit" name="follow" value={{follower}}></button>
+        </form>
+        {% endfor%}
+        {%endblock%}
 		</div>
 	</div>
 </div>
+
+
+<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+</form>
+<form action='' method='post'>
+{%csrf_token%}
+<button type='submit' name='share' value={{eachpost.id}}> share </button>
+</form>
+{% endfor %}
+</div>
+<h2> Following </h2>
+{% for follower in FOLLOWING%}
+<form action='' method='post'>
+{%csrf_token%}
+<input type="submit" name="follow" value={{follower}}></button>
+</form>
+{% endfor%}
+{%endblock%}
