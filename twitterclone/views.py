@@ -17,9 +17,13 @@ def home(request):
 					newshare = Share.objects.create(shared=request.user)
 					newshare.postid = postid
 					newshare.save()
+					for user in User.objects.all():
+						if request.user.username in user.profile.following.split(" "):
+							user.profile.notifications = user.profile.notifications+1
+							user.save()
+
 			except Exception as e:
-				print(str(e))
-				raise(e)
+				pass
 	
 
 
@@ -55,6 +59,10 @@ def home(request):
 				newcomment.post = Post.objects.get(pk=request.POST['submit'])
 				newcomment.text = comment
 				newcomment.save()
+				for user in User.objects.all():
+					if request.user.username in user.profile.following.split(" "):
+						user.profile.notifications = user.profile.notifications + 1
+						user.save()
 			except:
 				pass			
 		user = User.objects.get(pk=request.user.id)
