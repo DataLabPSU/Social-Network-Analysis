@@ -6,13 +6,13 @@
 	<div class="navbar-collapse collapse justify-content-between">
     	<ul class="navbar-nav mr-auto">
     			<li class="nav-item active">
-    				<a class="nav-link" href="#">Home</a>
+    				<a class="nav-link" href="#"><i class="fas fa-home"></i>Home</a>
     			</li>
     			<li>
-    				<a class="nav-link" href="#">Notifications</a>
+    				<a class="nav-link" href="#"><i class="fas fa-bell"></i>Notifications</a>
     			</li>
     			<li>
-    				<a class="nav-link" href="#">Messages</a>
+    				<a class="nav-link" href="#"><i class="fas fa-envelope"></i>Messages</a>
     			</li>
     	</ul>
     	<ul class="navbar-nav">
@@ -43,14 +43,16 @@
  		<div class="col-6 col-sm-6" style='background-color:#fff;'>
 			<div class='container'>
 			{% for eachpost in posts %}
-			<p style='font-family:Notable,sans-seriff;'> {{eachpost.title}} </p>
-			<p style='font-family:Raleway,sans-seriff;'> {{eachpost.text}}</p>
-			<blockquote style='font-family:Taviraj,seriff;font-size:smaller;'> by {{eachpost.author}} on {{eachpost.created_date}}
+
+			<p><strong>{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
+			<p> {{eachpost.title}} </p>
+			<p> {{eachpost.text}}</p>
+			
 			<form action='' method='post'>
 			{%csrf_token%}
 			<button type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} likes
 			</button>
-			</blockquote>
+			
 			</form>
 			{% for comment in comments%}
 			{% if comment.post == eachpost%}
@@ -61,13 +63,13 @@
 			{%csrf_token%}
 			<div class='input-field'>
 				<input id={{eachpost.id}} type='text' name='placeholder'>
-				<label for={{eachpost.id}}> Comment here </label>
+				<label for={{eachpost.id}}> <i class="fas fa-comments"></i> </label>
 			</div>
 			<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
 			</form>
 			<form action='' method='post'>
 				{%csrf_token%}
-				<button type='submit' name='share' value={{eachpost.id}}> share </button>
+				<button type='submit' name='share' value={{eachpost.id}}><i class="fas fa-retweet"></i></button>
 			</form>
 			{% endfor %}
 			</div>
