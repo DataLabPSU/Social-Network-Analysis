@@ -6,13 +6,13 @@
 	<div class="navbar-collapse collapse justify-content-between">
     	<ul class="navbar-nav mr-auto">
     			<li class="nav-item active">
-    				<a class="nav-link" href="#"><i class="fas fa-home"></i>Home</a>
+    				<a class="nav-link" href="#"><i class="fas fa-home" style="color:#8CCEF9;"></i>Home</a>
     			</li>
     			<li>
-    				<a class="nav-link" href="#"><i class="fas fa-bell"></i>Notifications</a>
+    				<a class="nav-link" href="#"><i class="fas fa-bell" style="color:#8CCEF9;"></i>Notifications</a>
     			</li>
     			<li>
-    				<a class="nav-link" href="#"><i class="fas fa-envelope"></i>Messages</a>
+    				<a class="nav-link" href="#"><i class="fas fa-envelope" style="color:#8CCEF9;"></i>Messages</a>
     			</li>
     	</ul>
     	<ul class="navbar-nav">
@@ -40,8 +40,7 @@
 <!-- Body of Home Page -->
 <div class='container'>
 	<div class="row justify-content-md-center">
- 		<div class="col-6 col-sm-6" style='background-color:#fff;'>
-			<div class='container'>
+ 		<div class="col-md-6" style='background-color:#fff;'>
 			{% for eachpost in posts %}
 
 			<p><strong>{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
@@ -50,7 +49,7 @@
 			
 			<form action='' method='post'>
 			{%csrf_token%}
-			<button type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} likes
+			<button type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
 			</button>
 			
 			</form>
@@ -72,23 +71,20 @@
 				<button type='submit' name='share' value={{eachpost.id}}><i class="fas fa-retweet"></i></button>
 			</form>
 			{% endfor %}
-			</div>
+			
 		</div>
-	
-
-    <div class="w-100 d-none d-md-block"></div>
 
 	
-		<div class="col- col-sm-3 ml-auto bg-info">
-		<h2> Following </h2>
-		{% for follower in FOLLOWING%}
-		<form action='' method='post'>
-		{%csrf_token%}
-		<input type="submit" name="follow" value={{follower}}></button>
-		</form>
-		{% endfor%}
-		{%endblock%}
-		</div>
+		<div class="col-md-3" style='background-color:#E8E4E6;'>
+			<h2> Following </h2>
+			{% for follower in FOLLOWING%}
+			<form action='' method='post'>
+			{%csrf_token%}
+			<input type="submit" name="follow" value={{follower}}></button>
+			</form>
+			{% endfor%}
+			{%endblock%}
+			
 		</div>
 	</div>
 </div>
