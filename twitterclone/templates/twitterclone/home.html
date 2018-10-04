@@ -1,54 +1,99 @@
 {%extends './base_generic.html' %}
 {%block content%}
-<nav>
-<div class='nav-wrapper'>
-<a href='#' class='brand-logo'>Placeholder</a>
-<ul id='nav-mobile' class='right hide-on-med-and-down'>
-<li><a href="/follow/"> Follow other people here! </a></li>
-<li>
-<a href="/logout/"> Logout here </a>
-</li><li>
-<a href = "/create/"> Make new posts here </a>
-</li>
-</ul>
-</div>
-</nav>
-<div class='container'>
-{% for eachpost in posts %}
-<div class='section'>
-<p style='font-family:Notable,sans-seriff;'> {{eachpost.title}} </p>
-<p style='font-family:Raleway,sans-seriff;'> {{eachpost.text}}</p>
-<blockquote style='font-family:Taviraj,seriff;font-size:smaller;'> by {{eachpost.author}} on {{eachpost.created_date}}<form action='' method='post'>
-{%csrf_token%}
-<button type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} likes</button></blockquote>
-</form>
-</div>
-<div class='divider'></div>
-{% for comment in comments%}
-{% if comment.post == eachpost%}
-<p> {{comment.text}} <span style='float:right;'>by {{comment.author}}</span> </p>
 
-{% endif %}
-{% endfor%}
-<form class = '' method='post'>
-{%csrf_token%}
-<div class='input-field'>
-<input id={{eachpost.id}} type='text' name='placeholder'>
-<label for={{eachpost.id}}> Comment here </label>
+<!-- Navigation bar -->
+<nav class="navbar border-bottom border-grey sticky-top navbar-expand-lg navbar-light" style="background-color: #fff;">
+	<div class="navbar-collapse collapse justify-content-between">
+    	<ul class="navbar-nav mr-auto">
+    			<li class="nav-item active">
+    				<a class="nav-link" href="../"><i class="fas fa-home" style="color:#8CCEF9;"></i>Home</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="#"><i class="fas fa-bell" style="color:#8CCEF9;"></i>Notifications</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="#"><i class="fas fa-envelope" style="color:#8CCEF9;"></i>Messages</a>
+    			</li>
+    	</ul>
+    	<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="/follow/"> Who to follow </a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More Options</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						<a class="dropdown-item" href="/create/">Profile</a>
+						<a class="dropdown-item" href="#">Settings</a>
+						<a class="dropdown-item" href="/logout/">Logout</a>
+					</div>
+				</li>
+				 <form class="form-inline">
+    			<input class="form-control mr-sm-2" type="search" placeholder="Search Twitter" aria-label="Search">
+    			
+  				</form>
+				<a class="btn btn-outline-info" href="/create/" role="button">Tweet</a>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<!-- Body of Home Page -->
+<div class='container'>
+	<div class="row justify-content-md-center">
+ 		<div class="col-md-6" style='background-color:#fff; margin-right: 10px;'>
+ 
+			{% for eachpost in posts %}
+			
+			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
+			<p align="center"> Title: {{eachpost.title}} </p>
+			<p align="center"> Post: {{eachpost.text}}</p>
+			
+			<form action='' method='post'>
+			{%csrf_token%}
+			<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+			</button>
+			</form>
+
+			{% for comment in comments%}
+			{% if comment.post == eachpost%}
+			<p align="center"><strong>Comment:</strong> {{comment.text}} <span style='float:right;'>by {{comment.author}}</span> </p>
+			{% endif %}
+			{% endfor%}
+
+			<form class = '' method='post'>
+			{%csrf_token%}
+			<div class='input-field' align="center">
+				<input id={{eachpost.id}} type='text' name='placeholder'>
+				<label for={{eachpost.id}}> <i class="fas fa-comments"></i> </label>
+			</div>
+			<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+			</form>
+			<form action='' method='post'>
+				{%csrf_token%}
+				<div align="center">
+				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-info btn-sm"><i class="fas fa-retweet"></i></button>
+				</div>
+			</form>
+			
+			<hr/>
+			{% endfor %}
+		
+		</div>
+
+	
+		<div class="col-md-3" style='background-color:#fff;'>
+			<h2 align="center"> Following </h2>
+			<hr/>
+			{% for follower in FOLLOWING%}
+			<form action='' method='post'>
+			{%csrf_token%}
+			<div align="center">
+			<input type="submit" name="follow" value={{follower}}></button>
+			</div>
+			</form>
+			<hr/>
+			{% endfor%}
+			{%endblock%}
+		</div>
+	</div>
 </div>
-<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
-</form>
-<form action='' method='post'>
-{%csrf_token%}
-<button type='submit' name='share' value={{eachpost.id}}> share </button>
-</form>
-{% endfor %}
-</div>
-<h2> Following </h2>
-{% for follower in FOLLOWING%}
-<form action='' method='post'>
-{%csrf_token%}
-<input type="submit" name="follow" value={{follower}}></button>
-</form>
-{% endfor%}
-{%endblock%}

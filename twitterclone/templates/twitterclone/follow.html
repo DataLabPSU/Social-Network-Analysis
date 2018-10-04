@@ -1,13 +1,47 @@
+{%extends './base_generic.html' %}
 {%block content%}
+<nav class="navbar border-bottom border-grey sticky-top navbar-expand-lg navbar-light" style="background-color: #fff;">
+	<div class="navbar-collapse collapse justify-content-between">
+    	<ul class="navbar-nav mr-auto">
+    			<li class="nav-item active">
+    				<a class="nav-link" href="../"><i class="fas fa-home" style="color:#8CCEF9;"></i>Home</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="#"><i class="fas fa-bell" style="color:#8CCEF9;"></i>Notifications</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="#"><i class="fas fa-envelope" style="color:#8CCEF9;"></i>Messages</a>
+    			</li>
+    	</ul>
+    	<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="/follow/"> Who to follow </a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More Option</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						<a class="dropdown-item" href="/create/">Profile</a>
+						<a class="dropdown-item" href="#">Settings</a>
+						<a class="dropdown-item" href="/logout/">Logout</a>
+					</div>
+				</li>
+				 <form class="form-inline">
+    			<input class="form-control mr-sm-2" type="search" placeholder="Search Twitter" aria-label="Search">
+    			
+  				</form>
+				<a class="btn btn-outline-info" href="/create/" role="button">Tweet</a>
+			</ul>
+		</div>
+	</div>
+</nav>
 
-<p> Simple follower implementation, click on the button to follow users </p>
-<div align=right>
-<a href ="../"> Home </a>
-</div>
-{%for eachuser in users %}
-<form action='' method="post">
-{%csrf_token%}
-<input type="submit" name="follow"  value={{eachuser.username}}>{{eachuser.username}}</button>
-</form>
+	<p align=center> Simple follower implementation, click on the button to follow users </p>
+	{%for eachuser in users %}
+	<div class="container" align="center">
+	<form action='' method="post">
+	{%csrf_token%}
+	<input type="submit" name="follow"  value={{eachuser.username}}></button>
+	</form>
+	</div>
 {%endfor%}
 {%endblock%}
