@@ -6,13 +6,14 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+import datetime
 
 
 def home(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             try:
-                follow = request.POST['follow']
+                follow = request.POST['follows']
                 user = request.user
                 user.profile.following = user.profile.following + " " + follow
                 user.save()
@@ -29,7 +30,7 @@ def home(request):
                     for user in User.objects.all():
                         if request.user.username in user.profile.following.split(" "):
                             user.profile.notifications = user.profile.notifications + 1
-                            user.profile.notificationsString += "Post shared by " + str(request.user) + "|"
+                            user.profile.notificationsString += "Post shared by " + str(request.user) + " at "+str(datetime.datetime.now()) + "|"
                             user.save()
 
             except Exception as e:
@@ -80,7 +81,7 @@ def home(request):
         shares = Share.objects.filter(shared=request.user)
         for z in shares:
             content = Post.objects.get(id=z.postid)
-            content.author.username = content.author.username + ', Shared by ' + z.shared.username
+            content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
             content.created_date = z.date
             postlist.append(content)
             print(postlist)
@@ -143,6 +144,16 @@ def addpost(request):
         form = forms.PostForm()
 
     return render(request, 'twitterclone/create.html', {'form': form})
+
+
+def notification(request):
+    temp = request.user.profile.notificationsString
+    num = request.user.profile.notifications
+    context = {
+        'notifications': temp.split("|"),
+        'num': num,
+    }
+    return render(request, 'twitterclone/notification.html', context)
 
 
 def testfollow(request):
