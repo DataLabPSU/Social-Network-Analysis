@@ -30,7 +30,7 @@ def home(request):
                     for user in User.objects.all():
                         if request.user.username in user.profile.following.split(" "):
                             user.profile.notifications = user.profile.notifications + 1
-                            user.profile.notificationsString += "Post shared by " + str(request.user) + " at "+str(datetime.datetime.now()) + "|"
+                            user.profile.notificationsString += "Post shared by " + str(request.user) + " at " + str(datetime.datetime.now()) + "|"
                             user.save()
 
             except Exception as e:
@@ -102,6 +102,11 @@ def home(request):
                         postlist.append(content)
         notificationsString = request.user.profile.notificationsString.split("|")
         userlist = User.objects.exclude(pk=request.user.id)
+        finaloutput = []
+        for i in set(user.profile.following.split(" ")[1:]):
+            tempuser = User.objects.get(username=i)
+            numfollowers = len(set(tempuser.profile.following.split(" ")[1:]))
+            finaloutput.append([i, numfollowers])
         context = {
             'posts': postlist,
             'comments': comments,
@@ -110,6 +115,7 @@ def home(request):
             'currentuser': request.user,
             'notifications': notificationsString,
             'users': userlist,
+            'numfollowers': finaloutput,
         }
 
         return render(request, "twitterclone/home.html", context)

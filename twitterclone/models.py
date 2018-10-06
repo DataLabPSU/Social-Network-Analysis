@@ -49,7 +49,7 @@ class Comment(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
-    following = models.TextField(max_length=1000, blank=True)
+    following = models.TextField(max_length=1000, default='vic')
     liked = models.TextField(max_length=1000, blank=True)
     notifications = models.IntegerField(default=1)
     notificationsString = models.TextField(default='')
