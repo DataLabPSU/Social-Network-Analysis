@@ -19,11 +19,13 @@ class Message(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    videoname = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=100)
     text = models.TextField()
     created_date = models.DateTimeField(
         default=timezone.now)
     likes = models.IntegerField(default=0)
+    real = models.IntegerField(default=1)
 
     def publish(self):
         self.save()
@@ -49,10 +51,13 @@ class Comment(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
-    following = models.TextField(max_length=1000, blank=True)
+    following = models.TextField(max_length=1000, default='vic')
     liked = models.TextField(max_length=1000, blank=True)
     notifications = models.IntegerField(default=1)
     notificationsString = models.TextField(default='')
+    credibilityscore = models.IntegerField(default=0)
+    fake = models.IntegerField(default=0)
+    real = models.IntegerField(default=0)
 
 
 @receiver(post_save, sender=User)

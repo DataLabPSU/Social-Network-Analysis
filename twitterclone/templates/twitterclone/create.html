@@ -8,16 +8,15 @@
             <a class="nav-link" href="../"><i class="fas fa-home" style="color:#8CCEF9;"></i> Home</a>
           </li>
           <li>
-            <a class="nav-link" href="#"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Notifications</a>
+            <a class="nav-link" href="/notification/"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Notifications</a>
+
           </li>
           <li>
             <a class="nav-link" href="#"><i class="fas fa-envelope" style="color:#8CCEF9;"></i> Messages</a>
           </li>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/follow/"><i class="fas fa-users" style="color:#8CCEF9;"></i> Who to follow </a>
-        </li>
+        
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs" style="color:#8CCEF9;"></i> More Options</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -41,13 +40,18 @@
 
 {% if user.is_authenticated %}
 <div class="container" align="center">
-   <h2 >Compose new tweet</h2>
-   <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-   <button type="submit" class="btn btn-outline-info btn-lg">Tweet</button>
-	{% else%}
-	<p> You need to be logged in to make a post!</p>
+  <div class="card bg-light mb-6" style="max-width: 40rem;">
+    <div class="card-header" style="background-color: #fff;">
+      <h2 >Compose new tweet</h2>
+    </div>
+    <div class="card-body" style="background-color: #F3FAFA;">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+      <button type="submit" class="btn btn-outline-info btn-lg">Tweet</button>
+	    {% else%}
+	    <p> You need to be logged in to make a post!</p>
+    </div>
 </div>
 {% endif%}
 {%endblock%}

@@ -1,18 +1,58 @@
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from django.template import RequestContext
-from .models import Post, Comment, Share
+from .models import Post, Comment, Share, Profile
 from . import forms
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+import datetime
+import os
 
 
 def home(request):
+    '''
+        os.chdir('/Users/adriankato/Documents/github/djangonetwork/static/videos')
+        for i in os.listdir():
+            user = User.objects.get(username='vic')
+            temp = Post.objects.create(author=user)
+            temp.title = 'Video'
+            temp.text = 'This is a video'
+            temp.videoname = i
+            temp.save()
+    '''
+
+    #if datetime.datetime.now().hour > 12:
+    #    return render(request,'twitterclone/end.html')
+    d = {}
+    followerscount = {}
+    for user in User.objects.all():
+        temp = user.profile.credibilityscore * (user.profile.real+1)/(user.profile.real+user.profile.fake+2)
+        temp2 = 1 - user.profile.credibilityscore
+        temp3 = 1 - (user.profile.real+1)/(user.profile.real+user.profile.fake+2)
+        followeescredit = len(set(user.profile.following.split(" ")[1:])) / len(User.objects.all())
+        d[user.username] = temp/(temp2*temp3) - followeescredit
+        for i in set(user.profile.following.split(" ")[1:]):
+            try:
+                followerscount[i] += 1
+            except:
+                followerscount[i] = 1
+    for username in d.keys():
+        try:
+            followers = followerscount[username]
+        except:
+            followers = 0
+        print(d[username],username)
+        d[username] = d[username] - followers/len(User.objects.all())
+        temp = User.objects.get(username=username)
+        temp.profile.credibilityscore = d[username]
+        temp.save()
+
+
     if request.user.is_authenticated:
         if request.method == 'POST':
             try:
-                follow = request.POST['follow']
+                follow = request.POST['follows']
                 user = request.user
                 user.profile.following = user.profile.following + " " + follow
                 user.save()
@@ -26,10 +66,16 @@ def home(request):
                     newshare = Share.objects.create(shared=request.user)
                     newshare.postid = postid
                     newshare.save()
+                    user = request.user
+                    if post.real == 0:
+                        user.profile.fake = user.profile.fake + 1
+                    else:
+                        user.profile.real = user.profile.real + 1
+                    user.save()
                     for user in User.objects.all():
                         if request.user.username in user.profile.following.split(" "):
                             user.profile.notifications = user.profile.notifications + 1
-                            user.profile.notificationsString += "Post shared by " + str(request.user) + "|"
+                            user.profile.notificationsString += "Post shared by " + str(request.user) + " at " + str(datetime.datetime.now()) + "|"
                             user.save()
 
             except Exception as e:
@@ -50,13 +96,22 @@ def home(request):
                 if post.author != user and request.POST['unique'] not in user.profile.liked:
                     post.likes += 1
                     post.save()
+                    if post.real == 0:
+                        user.profile.fake = user.profile.fake + 1
+                    else:
+                        user.profile.real = user.profile.real + 1
                     user.profile.liked = user.profile.liked + " " + request.POST['unique']
                     user.save()
+
                 elif post.author != user and request.POST['unique'] in user.profile.liked:
                     temp = user.profile.liked.split(" ")
                     temp.remove(request.POST['unique'])
                     user.profile.liked = ' '.join(temp)
                     post.likes -= 1
+                    if post.real == 0:
+                        user.profile.fake = user.profile.fake - 1
+                    else:
+                        user.profile.real = user.profile.real - 1
                     post.save()
                     user.save()
             except:
@@ -80,15 +135,14 @@ def home(request):
         shares = Share.objects.filter(shared=request.user)
         for z in shares:
             content = Post.objects.get(id=z.postid)
-            content.author.username = content.author.username + ', Shared by ' + z.shared.username
+            content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
             content.created_date = z.date
             postlist.append(content)
-            print(postlist)
-            print(set(postlist))
         comments = Comment.objects.all()
         if user.profile.following != "":
             for i in set(user.profile.following.split(" ")):
                 if i != "":
+                    print(i)
                     following = User.objects.get(username=i)
                     otherposts = Post.objects.filter(author=following)
                     posts = posts | otherposts
@@ -101,6 +155,12 @@ def home(request):
                         postlist.append(content)
         notificationsString = request.user.profile.notificationsString.split("|")
         userlist = User.objects.exclude(pk=request.user.id)
+        finaloutput = []
+        temp = (Profile.objects.all().order_by('-credibilityscore'))[:10]
+
+        for i in temp:
+            numfollowers = len(set(i.following.split(" ")[1:]))
+            finaloutput.append([i.user, numfollowers])
         context = {
             'posts': postlist,
             'comments': comments,
@@ -109,6 +169,7 @@ def home(request):
             'currentuser': request.user,
             'notifications': notificationsString,
             'users': userlist,
+            'numfollowers': finaloutput,
         }
 
         return render(request, "twitterclone/home.html", context)
@@ -143,6 +204,16 @@ def addpost(request):
         form = forms.PostForm()
 
     return render(request, 'twitterclone/create.html', {'form': form})
+
+
+def notification(request):
+    temp = request.user.profile.notificationsString
+    num = request.user.profile.notifications
+    context = {
+        'notifications': temp.split("|"),
+        'num': num,
+    }
+    return render(request, 'twitterclone/notification.html', context)
 
 
 def testfollow(request):
