@@ -25,6 +25,7 @@ class Post(models.Model):
     created_date = models.DateTimeField(
         default=timezone.now)
     likes = models.IntegerField(default=0)
+    real = models.IntegerField(default=1)
 
     def publish(self):
         self.save()
@@ -54,6 +55,9 @@ class Profile(models.Model):
     liked = models.TextField(max_length=1000, blank=True)
     notifications = models.IntegerField(default=1)
     notificationsString = models.TextField(default='')
+    credibilityscore = models.IntegerField(default=0)
+    fake = models.IntegerField(default=0)
+    real = models.IntegerField(default=0)
 
 
 @receiver(post_save, sender=User)
