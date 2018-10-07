@@ -44,7 +44,7 @@ a {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  background-image: url(https://pbs.twimg.com/profile_images/679974972278849537/bzzb-6H4_normal.jpg);
+  /*background-image: url(insert_stock_photo);*/
 }
 
 .btn-search-bar {
@@ -74,7 +74,7 @@ a {
 
 .profile-background {
   height: 320px;
-  background-image: url('https://pbs.twimg.com/profile_banners/439335622/1496682615/1500x500');
+  /*background-image: url(insert_stock_photo);*/
 }
 
 /* Main avatar */
@@ -88,7 +88,7 @@ a {
 
 .avatar {
   background: #fff;
-  background-image: url(https://pbs.twimg.com/profile_images/679974972278849537/bzzb-6H4_400x400.jpg);
+  /*background-image: url(insert_stock_photo);*/
   border: 5px solid #fff;
   border-radius: 50%;
   height: 200px;
