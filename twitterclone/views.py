@@ -7,9 +7,20 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 import datetime
+import os
 
 
 def home(request):
+
+    os.chdir('/Users/adriankato/Documents/github/djangonetwork/static/videos')
+    for i in os.listdir():
+        user = User.objects.get(username='vic')
+        temp = Post.objects.create(author=user)
+        temp.title = 'Video'
+        temp.text = 'This is a video'
+        temp.videoname = i
+        temp.save()
+
     if request.user.is_authenticated:
         if request.method == 'POST':
             try:
@@ -84,12 +95,11 @@ def home(request):
             content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
             content.created_date = z.date
             postlist.append(content)
-            print(postlist)
-            print(set(postlist))
         comments = Comment.objects.all()
         if user.profile.following != "":
             for i in set(user.profile.following.split(" ")):
                 if i != "":
+                    print(i)
                     following = User.objects.get(username=i)
                     otherposts = Post.objects.filter(author=following)
                     posts = posts | otherposts
@@ -103,9 +113,8 @@ def home(request):
         notificationsString = request.user.profile.notificationsString.split("|")
         userlist = User.objects.exclude(pk=request.user.id)
         finaloutput = []
-        for i in set(user.profile.following.split(" ")[1:]):
-            tempuser = User.objects.get(username=i)
-            numfollowers = len(set(tempuser.profile.following.split(" ")[1:]))
+        for i in (User.objects.all()):
+            numfollowers = len(set(i.profile.following.split(" ")[1:]))
             finaloutput.append([i, numfollowers])
         context = {
             'posts': postlist,

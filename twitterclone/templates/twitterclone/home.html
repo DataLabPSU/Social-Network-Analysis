@@ -64,7 +64,7 @@
 			</div>
 			<br/>	
 			<div align="center">
-			<input type="submit" name="follows"  value="Follow" class="btn btn-outline-info btn-sm"></button>
+			<button type="submit" name="follows"  value={{eachuser.0}} class="btn btn-outline-info btn-sm">Follow</button>
 
 			
 			</div>
@@ -79,13 +79,18 @@
 			<br/>
 			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
 			<!-- <p align="center"> Title: {{eachpost.title}} </p> -->
-			<p align="center">{{eachpost.text}}</p>
+			<!--<p align="center">{{eachpost.text}}</p>-->
+			<video width="320" height="240" controls>
+				<source src="{{ MEDIA_URL }}/videos/{{eachpost.videoname}}" type="video/mp4">
+			</video>
+
 			<br/>
 			{% for comment in comments%}
 			{% if comment.post == eachpost%}
 			<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
 			{% endif %}
 			{% endfor%}
+
 
 			<form class = '' method='post'>
 			{%csrf_token%}
@@ -129,7 +134,7 @@
 			</div>
 			<br/>
 			<div align="center">
-			<input type="submit" name="follow" value=Unfollow class="btn btn-outline-info btn-sm"></button>
+			<button type="submit" name="follow" value="{{follower}}" class="btn btn-outline-info btn-sm">Unfollow</button>
 			</div>
 			</form>
 			<hr/>

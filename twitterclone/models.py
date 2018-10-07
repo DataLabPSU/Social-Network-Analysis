@@ -19,6 +19,7 @@ class Message(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    videoname = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=100)
     text = models.TextField()
     created_date = models.DateTimeField(
