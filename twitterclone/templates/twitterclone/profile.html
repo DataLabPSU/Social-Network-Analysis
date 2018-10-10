@@ -10,7 +10,7 @@
 {% for image in images %}
 <form action = '' method = 'post'>
     {%csrf_token%}
-    <input type="hidden" name="hidden" value="{{image}}.jpeg">
+    <input type="hidden" name="hidden" value="{{image}}">
     <input type="image" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
 
 </form>

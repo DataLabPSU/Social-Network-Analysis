@@ -63,9 +63,10 @@
 			{%for eachuser in numfollowers %}
 			<form action='' method="post">
 			{%csrf_token%}
-			<div align="center">
-				<button class="btn btn-secondary btn-circle" type="button" aria-haspopup="true" aria-expanded="false"></button>
+			<div align="center" style="background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+				<button  type="button" aria-haspopup="true" aria-expanded="false"  ></button>
 			<strong>
+				<br/>
 			{{eachuser.0}}
 			</strong>
 			</div>
@@ -145,15 +146,18 @@
 			{% for follower in FOLLOWING%}
 			<form action='' method='post'>
 			{%csrf_token%}
-			<div align="center">
-				<button class="btn btn-secondary btn-circle" type="button" aria-haspopup="true" aria-expanded="false"></button>
+				<div align="center" style="background-image:url({{ MEDIA_URL}}images/{{follower.profile.imagename}}.jpeg);">
+
+				<button  type="button" aria-haspopup="true" aria-expanded="false"></button>
+					<br/>
 			<strong>
-				{{follower}}
+				{{follower.username}}
 			</strong>
 			</div>
 			<br/>
 			<div align="center">
 			<button type="submit" name="follow" value="{{follower}}" class="btn btn-follow">Unfollow</button>
+
 			</div>
 			</form>
 			<hr/>

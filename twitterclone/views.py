@@ -162,10 +162,13 @@ def home(request):
             if i.user != request.user:
                 numfollowers = len(set(i.following.split(" ")[1:]))
                 finaloutput.append([i.user, numfollowers])
+        following = []
+        for i in set(user.profile.following.split(" ")[1:]):
+            following.append(User.objects.get(username=i))
         context = {
             'posts': postlist,
             'comments': comments,
-            'FOLLOWING': set(user.profile.following.split(" ")[1:]),
+            'FOLLOWING': following,
             'test': (user.profile.following.split(" ")),
             'currentuser': request.user,
             'notifications': notificationsString,
