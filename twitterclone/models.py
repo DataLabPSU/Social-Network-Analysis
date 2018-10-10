@@ -55,10 +55,10 @@ class Profile(models.Model):
     liked = models.TextField(max_length=1000, blank=True)
     notifications = models.IntegerField(default=1)
     notificationsString = models.TextField(default='')
-    credibilityscore = models.IntegerField(default=0)
+    credibilityscore = models.FloatField(default=0)
     fake = models.IntegerField(default=0)
     real = models.IntegerField(default=0)
-
+    imagename = models.TextField(default='image0')
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

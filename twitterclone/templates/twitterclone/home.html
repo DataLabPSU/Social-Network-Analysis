@@ -30,7 +30,7 @@
       <button class="btn btn-secondary dropdown-toggle btn-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 					
-						<a class="dropdown-item" href="/create/">Profile</a>
+						<a class="dropdown-item" href="/profile/">Profile</a>
 						<a class="dropdown-item" href="#">Settings</a>
 						<a class="dropdown-item" href="/logout/">Logout</a>
 					</div>
@@ -71,7 +71,11 @@
 			<div align="center">
 			{{ eachuser.1 }} Followers
 			</div>
-			<br/>	
+			<br/>
+			<div align="center">
+			Credibility : 		{{eachuser.0.profile.credibilityscore}}
+			</div>
+			<br/>
 			<div align="center">
 			<button type="submit" name="follows"  value={{eachuser.0}} class="btn btn-follow">Follow</button>
 

@@ -7,7 +7,8 @@ urlpatterns=[
 path('signup/',views.signup,name='signup'),
 path('',views.home,name='home'),
 path('create/',views.addpost,name='addpost'),
-path('notification/', views.notification, name='notification')
+path('notification/', views.notification, name='notification'),
+path('profile/',views.pick,name='profile')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 

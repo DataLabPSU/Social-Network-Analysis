@@ -1,0 +1,19 @@
+{% extends './base_generic.html' %}
+{% load static %}
+{% block content %}
+<!--<form action = '' method = 'post'>
+    {%csrf_token%}
+    <input type="hidden" name="hidden" value="image0.jpeg">
+    <input type="image"  src="{{ MEDIA_URL }}/images/{{user.profile.imagename}}.jpeg" >
+</form> -->
+<p> Click on any image to change your profile picture</p>
+{% for image in images %}
+<form action = '' method = 'post'>
+    {%csrf_token%}
+    <input type="hidden" name="hidden" value="{{image}}.jpeg">
+    <input type="image" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
+
+</form>
+{%endfor%}
+
+{% endblock%}

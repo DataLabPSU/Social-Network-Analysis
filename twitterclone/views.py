@@ -159,8 +159,9 @@ def home(request):
         temp = (Profile.objects.all().order_by('-credibilityscore'))[:10]
 
         for i in temp:
-            numfollowers = len(set(i.following.split(" ")[1:]))
-            finaloutput.append([i.user, numfollowers])
+            if i.user != request.user:
+                numfollowers = len(set(i.following.split(" ")[1:]))
+                finaloutput.append([i.user, numfollowers])
         context = {
             'posts': postlist,
             'comments': comments,
@@ -227,3 +228,15 @@ def testfollow(request):
         'users': userlist
     }
     return render(request, 'twitterclone/follow.html', context)
+
+def pick(request):
+    if request.method == 'POST':
+        user = User.objects.get(pk=request.user.id)
+        user.profile.imagename = request.POST['hidden']
+        user.save()
+    context = {
+        'images':['image'+str(i) for i in range(4)],
+        'user':request.user,
+    }
+    print(context)
+    return render(request,'twitterclone/profile.html',context)
