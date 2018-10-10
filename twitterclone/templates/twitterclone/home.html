@@ -60,20 +60,21 @@
 				</div>
 			</div>
 			<hr/>
+
 			{%for eachuser in numfollowers %}
 			<form action='' method="post">
 			{%csrf_token%}
-			<div align="center" style="background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
-				<button  type="button" aria-haspopup="true" aria-expanded="false"  ></button>
+			<div align="center">
+			<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+			</div>
 			<strong>
-				<br/>
 			{{eachuser.0}}
 			</strong>
 			</div>
 			<div align="center">
 			{{ eachuser.1 }} Followers
 			</div>
-			<br/>
+			
 			<div align="center">
 			Credibility : 		{{eachuser.0.profile.credibilityscore}}
 			</div>
@@ -146,10 +147,9 @@
 			{% for follower in FOLLOWING%}
 			<form action='' method='post'>
 			{%csrf_token%}
-				<div align="center" style="background-image:url({{ MEDIA_URL}}images/{{follower.profile.imagename}}.jpeg);">
-
-				<button  type="button" aria-haspopup="true" aria-expanded="false"></button>
-					<br/>
+			<div align="center">
+			<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+			</div>
 			<strong>
 				{{follower.username}}
 			</strong>
