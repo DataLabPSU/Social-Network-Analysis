@@ -30,8 +30,8 @@
       <button class="btn btn-secondary dropdown-toggle btn-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 					
-						<a class="dropdown-item" href="/profile/">Profile</a>
-						<a class="dropdown-item" href="#">Settings</a>
+						<a class="dropdown-item" href="/{{request.user.username}}/">Profile</a>
+						<a class="dropdown-item" href="settings/">Settings</a>
 						<a class="dropdown-item" href="/logout/">Logout</a>
 					</div>
 				</div>
@@ -140,6 +140,19 @@
 		<div class="col-md-auto" style='background-color:#fff;'>
 			<div class="content-panel">
           		<div class="panel-header">
+          	<div align="center">
+          	<h4 align="center">{{request.user.username}}</h4>
+          	<div align="center">
+          		<input type="image" style="height: 40px;width: 40px;border-radius: 50%;" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
+			</div>
+			</div>
+			<div align="center">
+          		{{curfollowersnum}} Following
+          		<br/>
+          		{{curfolloweesnum}} Followers
+          	</div>
+          	</div>
+          	<hr/>   	
 			<h4 align="center" > <span style="padding-right: 10px; padding-left:10px;">Following</span> </h4>
 			</div>
 			</div>

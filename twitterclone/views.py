@@ -22,16 +22,16 @@ def home(request):
             temp.save()
     '''
 
-    #if datetime.datetime.now().hour > 12:
+    # if datetime.datetime.now().hour > 12:
     #    return render(request,'twitterclone/end.html')
     d = {}
     followerscount = {}
     for user in User.objects.all():
-        temp = user.profile.credibilityscore * (user.profile.real+1)/(user.profile.real+user.profile.fake+2)
+        temp = user.profile.credibilityscore * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
         temp2 = 1 - user.profile.credibilityscore
-        temp3 = 1 - (user.profile.real+1)/(user.profile.real+user.profile.fake+2)
+        temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
         followeescredit = len(set(user.profile.following.split(" ")[1:])) / len(User.objects.all())
-        d[user.username] = temp/(temp2*temp3) - followeescredit
+        d[user.username] = temp / (temp2 * temp3) - followeescredit
         for i in set(user.profile.following.split(" ")[1:]):
             try:
                 followerscount[i] += 1
@@ -42,12 +42,11 @@ def home(request):
             followers = followerscount[username]
         except:
             followers = 0
-        print(d[username],username)
-        d[username] = d[username] - followers/len(User.objects.all())
+        print(d[username], username)
+        d[username] = d[username] - followers / len(User.objects.all())
         temp = User.objects.get(username=username)
         temp.profile.credibilityscore = d[username]
         temp.save()
-
 
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -165,6 +164,11 @@ def home(request):
         following = []
         for i in set(user.profile.following.split(" ")[1:]):
             following.append(User.objects.get(username=i))
+        followeenum = 0
+        for i in User.objects.all():
+            if request.user.username in i.profile.following.split(" "):
+                followeenum += 1
+
         context = {
             'posts': postlist,
             'comments': comments,
@@ -174,6 +178,9 @@ def home(request):
             'notifications': notificationsString,
             'users': userlist,
             'numfollowers': finaloutput,
+            'curfollowersnum': len(following),
+            'curfolloweesnum': followeenum,
+            'image': request.user.profile.imagename
         }
 
         return render(request, "twitterclone/home.html", context)
@@ -232,14 +239,15 @@ def testfollow(request):
     }
     return render(request, 'twitterclone/follow.html', context)
 
+
 def pick(request):
     if request.method == 'POST':
         user = User.objects.get(pk=request.user.id)
         user.profile.imagename = request.POST['hidden']
         user.save()
     context = {
-        'images':['image'+str(i) for i in range(4)],
-        'user':request.user,
+        'images': ['image' + str(i) for i in range(4)],
+        'user': request.user,
     }
     print(context)
-    return render(request,'twitterclone/profile.html',context)
+    return render(request, 'twitterclone/settings.html', context)
