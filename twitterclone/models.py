@@ -26,6 +26,7 @@ class Post(models.Model):
         default=timezone.now)
     likes = models.IntegerField(default=0)
     real = models.IntegerField(default=1)
+    sharecomment = models.TextField(default='')
 
     def publish(self):
         self.save()
@@ -33,11 +34,18 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+class Messages(models.Model):
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    recipient = models.TextField(default='')
+    text = models.TextField(default='')
+    time = models.DateTimeField(default=timezone.now)
+
 
 class Share(models.Model):
     shared = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     postid = models.TextField()
     date = models.DateTimeField(default=timezone.now)
+    comment = models.TextField(default='')
 
 
 class Comment(models.Model):
@@ -59,6 +67,7 @@ class Profile(models.Model):
     fake = models.IntegerField(default=0)
     real = models.IntegerField(default=0)
     imagename = models.TextField(default='image0')
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

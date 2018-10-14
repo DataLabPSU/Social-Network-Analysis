@@ -8,7 +8,8 @@ path('signup/',views.signup,name='signup'),
 path('',views.home,name='home'),
 path('create/',views.addpost,name='addpost'),
 path('notification/', views.notification, name='notification'),
-path('settings/',views.pick,name='settings')
+path('settings/',views.pick,name='settings'),
+path('pm/',views.pm,name='pm')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 

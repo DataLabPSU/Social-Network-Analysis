@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from django.template import RequestContext
-from .models import Post, Comment, Share, Profile
+from .models import Post, Comment, Share, Profile, Message
 from . import forms
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -27,8 +27,8 @@ def home(request):
     d = {}
     followerscount = {}
     for user in User.objects.all():
-        temp = user.profile.credibilityscore * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-        temp2 = 1 - user.profile.credibilityscore
+        temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+        temp2 = 1 - abs(user.profile.credibilityscore)
         temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
         followeescredit = len(set(user.profile.following.split(" ")[1:])) / len(User.objects.all())
         d[user.username] = temp / (temp2 * temp3) - followeescredit
@@ -64,6 +64,11 @@ def home(request):
                 if request.user != post.author:
                     newshare = Share.objects.create(shared=request.user)
                     newshare.postid = postid
+                    try:
+                        newshare.comment = request.POST['sharecomment']
+                    except Exception as e:
+                        print(str(e))
+                        pass
                     newshare.save()
                     user = request.user
                     if post.real == 0:
@@ -136,6 +141,8 @@ def home(request):
             content = Post.objects.get(id=z.postid)
             content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
             content.created_date = z.date
+            content.sharecomment = z.comment
+
             postlist.append(content)
         comments = Comment.objects.all()
         if user.profile.following != "":
@@ -151,6 +158,7 @@ def home(request):
                         content = Post.objects.get(id=z.postid)
                         content.author.username = content.author.username + ' Shared by ' + z.shared.username
                         content.created_date = z.date
+                        content.sharecomment = z.comment
                         postlist.append(content)
         notificationsString = request.user.profile.notificationsString.split("|")
         userlist = User.objects.exclude(pk=request.user.id)
@@ -251,3 +259,27 @@ def pick(request):
     }
     print(context)
     return render(request, 'twitterclone/settings.html', context)
+
+def pm(request):
+    if request.method =='POST':
+        temp = Message.objects.create(text=request.POST['message'])
+        temp.recipient = request.POST['to']
+    d = {}
+    for i in Message.objects.all():
+        if i.recipient == request.user.username or i.author == request.user:
+            if i.recipient == request.user.username:
+                try:
+                    d[i.author.username].append(i.text)
+                except:
+                    d[i.author.username] = [i.text]
+            else:
+                try:
+                    d[i.recipient].append(i.text)
+                except:
+                    d[i.recipient] = [i.text]
+    d['vic'] = ['hello there','hi']
+    context = {
+        'messages':d
+    }
+    print(d)
+    return render(request,'twitterclone/pm.html',context)

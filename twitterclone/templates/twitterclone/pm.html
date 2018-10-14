@@ -1,0 +1,9 @@
+{% extends './base_generic.html' %}
+{% block content %}
+{% for keys,values in messages.items %}
+<h1>from {{keys}}</h1>
+{% for message in values %}
+<p> {{message}}</p>
+{% endfor %}
+{% endfor %}
+{% endblock %}

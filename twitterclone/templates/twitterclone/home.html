@@ -93,14 +93,20 @@
  
 			{% for eachpost in posts %}
 			<br/>
+			{% if eachpost.sharecomment %}
+			<p>{{eachpost.sharecomment}}</p>
+			{% endif %}
 			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
-			<!-- <p align="center"> Title: {{eachpost.title}} </p> -->
-			<!--<p align="center">{{eachpost.text}}</p>-->
+			<p align="center"> Title: {{eachpost.title}} </p>
+			-<p align="center">{{eachpost.text}}</p>
+
+			{% if eachpost.videoname %}
 			<video width="320" height="240" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
 				<source src="{{ MEDIA_URL }}/videos/{{eachpost.videoname}}" type="video/mp4">
 			</video>
 
 			<br/>
+			{% endif %}
 			{% for comment in comments%}
 			{% if comment.post == eachpost%}
 			<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
@@ -127,7 +133,11 @@
 
 			<form action='' method='post'>
 				{%csrf_token%}
+					<div class='input-field' align="center">
+				<input id={{eachpost.id}} type='text' name='sharecomment'>
+					</div>
 				<div align="center">
+
 				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
 				</div>
 			</form>
