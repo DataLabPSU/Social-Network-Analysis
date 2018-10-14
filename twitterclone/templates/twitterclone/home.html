@@ -96,7 +96,7 @@
 			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
 			<!-- <p align="center"> Title: {{eachpost.title}} </p> -->
 			<!--<p align="center">{{eachpost.text}}</p>-->
-			<video width="320" height="240" style="display:block; margin: 0 auto;" controls>
+			<video width="320" height="240" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
 				<source src="{{ MEDIA_URL }}/videos/{{eachpost.videoname}}" type="video/mp4">
 			</video>
 
