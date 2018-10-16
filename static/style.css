@@ -270,6 +270,12 @@ a {
 .btn-follow:hover {
   background-color: #E8F5FD;
 }
+
+.btn-unfollow {
+  background-color:   #FFFFFF;
+  color: #000000;
+  border-color: #000000;
+}
 /* END: Right column*/
 
 /* END: Main content elements' styles */

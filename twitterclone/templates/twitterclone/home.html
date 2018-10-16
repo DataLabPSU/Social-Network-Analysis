@@ -141,7 +141,36 @@
 				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
 				</div>
 			</form>
-			
+
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#retweetModal">
+				Click test
+			</button>
+
+			<div class="modal fade" id="retweetModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							bob
+						</div>
+						<div class="modal-body">
+							<form action='' method='post'>
+								{%csrf_token%}
+								<div class='input-field' align="center">
+									<input id={{eachpost.id}} type='text' name='sharecomment'>
+								</div>
+								<div align="center">
+									<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
 			<hr/>
 			{% endfor %}
 		</div>

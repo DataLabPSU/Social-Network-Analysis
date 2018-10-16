@@ -260,8 +260,9 @@ def pick(request):
     print(context)
     return render(request, 'twitterclone/settings.html', context)
 
+
 def pm(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         temp = Message.objects.create(text=request.POST['message'])
         temp.recipient = request.POST['to']
     d = {}
@@ -277,9 +278,9 @@ def pm(request):
                     d[i.recipient].append(i.text)
                 except:
                     d[i.recipient] = [i.text]
-    d['vic'] = ['hello there','hi']
+    d['vic'] = ['hello there', 'hi']
     context = {
-        'messages':d
+        'messages': d
     }
     print(d)
-    return render(request,'twitterclone/pm.html',context)
+    return render(request, 'twitterclone/pm.html', context)
