@@ -150,36 +150,37 @@
 		<div class="col-md-auto" style='background-color:#fff;'>
 			<div class="content-panel">
           		<div class="panel-header">
-          	<div align="center">
-          	<h4 align="center">{{request.user.username}}</h4>
-          	<div align="center">
-          		<input type="image" style="height: 40px;width: 40px;border-radius: 50%;" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
-			</div>
-			</div>
-			<div align="center">
-          		{{curfollowersnum}} Following
-          		<br/>
-          		{{curfolloweesnum}} Followers
-          	</div>
-          	</div>
-          	<hr/>   	
-			<h4 align="center" > <span style="padding-right: 10px; padding-left:10px;">Following</span> </h4>
-			</div>
-			</div>
+          			<div align="center">
+          				<h4 align="center">{{request.user.username}}</h4>
+          				<div align="center">
+          					<input type="image" style="height: 40px;width: 40px;border-radius: 50%;" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
+						</div>
+					</div>
+					<div align="center">
+          				{{curfollowersnum}} Following
+          				<br/>
+          				{{curfolloweesnum}} Followers
+          			</div>
+          		</div>
+          		<hr/>   	
+				<h4 align="center" > <span style="padding-right: 10px; padding-left:10px;">Following</span> </h4>
+			
+			
 			<hr/>
+
 			{% for follower in FOLLOWING%}
 			<form action='' method='post'>
 			{%csrf_token%}
 			<div align="center">
-			<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
-			</div>
+				<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+				</div>
 			<strong>
 				{{follower.username}}
 			</strong>
 			</div>
 			<br/>
 			<div align="center">
-			<button type="submit" name="follow" value="{{follower.username}}" class="btn btn-follow">Unfollow</button>
+				<button type="submit" name="follow" value="{{follower.username}}" class="btn btn-follow">Unfollow</button>
 
 			</div>
 			</form>
