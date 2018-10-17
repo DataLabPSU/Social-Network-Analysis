@@ -114,7 +114,7 @@
 			{% endfor%}
 
 
-			<form class = '' method='post'>
+			<!-- <form class = '' method='post'>
 			{%csrf_token%}
 			<div class='input-field' align="center">
 				<input id={{eachpost.id}} type='text' name='placeholder'>
@@ -122,46 +122,102 @@
 			</div>
 			<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
 			</form>
-			<br/>
+			<br/> -->
+
+			<div class="tweet-footer" align="center">
+                <a class="tweet-footer-btn">
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentModal"> <i class="fas fa-comment-alt"></i> 
+					</button>
+					 </a>
+			
+				<a class="tweet-footer-btn">
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#retweetModal"><i class="fas fa-retweet"></i>
+					</button>
+				</a>
 
 			
-			<form action='' method='post'>
+				<form action='' method='post'>
+					<a class="tweet-footer-btn">
+					{%csrf_token%}
+					<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+					</button>
+					</a>
+				</form>
+			</div>
+
+				<div class="modal fade" id="commentModal">
+				<div class="modal-dialog modal-dialog-centered" role="dialog">
+					<div class="modal-content">
+						<div class="modal-header" align="center">
+							<strong>Make a reply</strong>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<form class = '' method='post'>
+								{%csrf_token%}
+								<div class='input-field' align="center">
+									<input id={{eachpost.id}} type='text' name='placeholder'>
+									<label for={{eachpost.id}}> <i class="fas fa-comment-alt"></i> </label>
+								</div>
+								<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+								</form>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+				</div>
+
+
+
+
+			
+			<!-- <form action='' method='post'>
 			{%csrf_token%}
 			<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
 			</button>
-			</form>
+			</form> -->
+			
 
-			<form action='' method='post'>
+			<!-- <form action='' method='post'>
 				{%csrf_token%}
 					<div class='input-field' align="center">
-				<input id={{eachpost.id}} type='text' name='sharecomment'>
+						<input id={{eachpost.id}} type='text' name='sharecomment'>
 					</div>
 				<div align="center">
 
 				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
 				</div>
 			</form>
-
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#retweetModal">
-				Click test
-			</button>
+ -->
+			<!-- <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#retweetModal"><i class="fas fa-retweet">
+				RetweetModel test
+			</i>
+			</button> -->
 
 			<div class="modal fade" id="retweetModal">
-				<div class="modal-dialog">
+				<div class="modal-dialog modal-dialog-centered" role="dialog">
 					<div class="modal-content">
-						<div class="modal-header">
-							bob
+						<div class="modal-header" align="center">
+							<strong>Retweet this to your followers?</strong>
 						</div>
 						<div class="modal-body">
-							<form action='' method='post'>
-								{%csrf_token%}
-								<div class='input-field' align="center">
-									<input id={{eachpost.id}} type='text' name='sharecomment'>
-								</div>
-								<div align="center">
-									<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
-								</div>
-							</form>
+							<div class="form-group">
+								<form action='' method='post'>
+									
+									{%csrf_token%}
+									<div class='input-field' align="center">
+										<input id={{eachpost.id}} type='text' name='sharecomment' form="modal-form">
+									</div>
+								</br>
+									<div align="center">
+										<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
+									</div>
+								
+								</form>
+							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -169,6 +225,7 @@
 					</div>
 				</div>
 			</div>
+			
 
 
 			<hr/>

@@ -271,10 +271,21 @@ a {
   background-color: #E8F5FD;
 }
 
-.btn-unfollow {
-  background-color:   #FFFFFF;
-  color: #000000;
-  border-color: #000000;
+.btn-ufollow {
+  border-color: #1DA1F2;
+  color: #1DA1F2;
+  background-color: #fff;
+  border: 1px solid #1da1f2;
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  box-shadow: none;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  min-width: 89px;
 }
 /* END: Right column*/
 
