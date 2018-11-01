@@ -53,7 +53,7 @@
 <!--<form action = '' method = 'post'>
     {%csrf_token%}
     <input type="hidden" name="hidden" value="image0.jpeg">
-    <input type="image"  src="{{ MEDIA_URL }}/images/{{user.profile.imagename}}.jpeg" >
+    <input type="image"  src="{{ MEDIA_URL }}/images/{{user.profile.imagename}}" >
 </form> -->
 
 <div class='container'>
@@ -67,7 +67,7 @@
 				<form action = '' method = 'post'>
 		    		{%csrf_token%}
 		    		<input type="hidden" name="hidden" value="{{image}}">
-		    		<input type="image" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
+		    		<input type="image" src="{{ MEDIA_URL }}images/{{image}}" >
 				</form>
 		<br/>
 		{%endfor%}

@@ -12,40 +12,34 @@ import os
 
 def home(request):
     '''
-        os.chdir('/Users/adriankato/Documents/github/djangonetwork/static/videos')
-        for i in os.listdir():
+    os.chdir('/home/datalab/Desktop/newDirDMT/DjangoNetwork/media/videos')
+    for i in os.listdir():
+        if i[-3:] == 'mp4':
             user = User.objects.get(username='vic')
             temp = Post.objects.create(author=user)
             temp.title = 'Video'
             temp.text = 'This is a video'
             temp.videoname = i
+            if (i[:-3]+"en.vtt") in os.listdir():
+                temp.subtitles = i[:-3]+"en.vtt"
             temp.save()
-    '''
+    '''   
+    
 
     # if datetime.datetime.now().hour > 12:
     #    return render(request,'twitterclone/end.html')
     d = {}
+    print(request.POST)
     followerscount = {}
     for user in User.objects.all():
         temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
         temp2 = 1 - abs(user.profile.credibilityscore)
         temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-        followeescredit = len(set(user.profile.following.split(" ")[1:])) / len(User.objects.all())
-        d[user.username] = temp / (temp2 * temp3) - followeescredit
-        for i in set(user.profile.following.split(" ")[1:]):
-            try:
-                followerscount[i] += 1
-            except:
-                followerscount[i] = 1
-    for username in d.keys():
-        try:
-            followers = followerscount[username]
-        except:
-            followers = 0
-        print(d[username], username)
-        d[username] = d[username] - followers / len(User.objects.all())
-        temp = User.objects.get(username=username)
-        temp.profile.credibilityscore = d[username]
+   
+        d[user.username] = temp / (temp + temp2 * temp3)
+         
+        temp = User.objects.get(username=user.username)
+        temp.profile.credibilityscore = d[user.username]
         temp.save()
 
     if request.user.is_authenticated:
@@ -88,8 +82,10 @@ def home(request):
             try:
 
                 user = User.objects.get(pk=request.user.id)
-                temp = user.profile.following.split(" ")
+                temp = set(user.profile.following.split(" "))
+             
                 temp.remove(request.POST['follow'])
+                
                 user.profile.following = ' '.join(temp)
                 user.save()
             except:
@@ -148,7 +144,7 @@ def home(request):
         if user.profile.following != "":
             for i in set(user.profile.following.split(" ")):
                 if i != "":
-                    print(i)
+                   
                     following = User.objects.get(username=i)
                     otherposts = Post.objects.filter(author=following)
                     posts = posts | otherposts
@@ -163,12 +159,22 @@ def home(request):
         notificationsString = request.user.profile.notificationsString.split("|")
         userlist = User.objects.exclude(pk=request.user.id)
         finaloutput = []
-        temp = (Profile.objects.all().order_by('-credibilityscore'))[:10]
-
+        temp = (Profile.objects.all().order_by('-credibilityscore'))[:15]
+        dictionary = {}
+      
+        for i in User.objects.all():
+            for z in set(i.profile.following.split(" ")):
+                try:
+                   dictionary[z] += 1
+                except:
+                   dictionary[z] = 1
         for i in temp:
-            if i.user != request.user:
-                numfollowers = len(set(i.following.split(" ")[1:]))
-                finaloutput.append([i.user, numfollowers])
+            if i.user != request.user and i.user.username not in request.user.profile.following.split(" "):
+                 
+                 try:
+                   finaloutput.append([i.user,dictionary[i.user.username]])
+                 except:
+                   finaloutput.append([i.user,0])              
         following = []
         for i in set(user.profile.following.split(" ")[1:]):
             following.append(User.objects.get(username=i))
@@ -176,7 +182,11 @@ def home(request):
         for i in User.objects.all():
             if request.user.username in i.profile.following.split(" "):
                 followeenum += 1
-
+        print(finaloutput)
+        for i in finaloutput:
+             if i[0] in following:
+                finaloutput.remove([i[0],i[1]])
+        
         context = {
             'posts': postlist,
             'comments': comments,
@@ -253,8 +263,10 @@ def pick(request):
         user = User.objects.get(pk=request.user.id)
         user.profile.imagename = request.POST['hidden']
         user.save()
+    os.chdir('/home/datalab/Desktop/newDirDMT/DjangoNetwork/media/images')
+    images = [i for i in os.listdir()[:15]]
     context = {
-        'images': ['image' + str(i) for i in range(4)],
+        'images': images,
         'user': request.user,
     }
     print(context)
