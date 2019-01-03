@@ -28,7 +28,7 @@ class Post(models.Model):
     likes = models.IntegerField(default=0)
     real = models.IntegerField(default=1)
     sharecomment = models.TextField(default='')
-
+    updated = models.DateTimeField(default=timezone.now)
     def publish(self):
         self.save()
 
@@ -48,6 +48,11 @@ class Share(models.Model):
     date = models.DateTimeField(default=timezone.now)
     comment = models.TextField(default='')
 
+class Survey(models.Model):
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    age = models.IntegerField()
+    gender = models.TextField()
+    suggestions = models.TextField()
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, blank=True, null=True, on_delete=models.CASCADE)
@@ -64,11 +69,11 @@ class Profile(models.Model):
     liked = models.TextField(max_length=1000, blank=True)
     notifications = models.IntegerField(default=1)
     notificationsString = models.TextField(default='')
-    credibilityscore = models.FloatField(default=0)
+    credibilityscore = models.FloatField(default=0.1)
     fake = models.IntegerField(default=0)
     real = models.IntegerField(default=0)
-    imagename = models.TextField(default='image0')
-
+    imagename = models.TextField(default='image0.jpeg')
+    amazonid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

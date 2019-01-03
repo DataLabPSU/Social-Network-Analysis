@@ -12,25 +12,52 @@ import os
 
 def home(request):
     '''
-    os.chdir('/home/datalab/Desktop/newDirDMT/DjangoNetwork/media/videos')
-    for i in os.listdir():
-        if i[-3:] == 'mp4':
+    if request.user == User.objects.get(username='admin'):   
+        os.chdir('/root/DjangoNetwork/media/videos/')
+        for i in os.listdir():
+            if i[-3:] == 'mp4':
+                user = User.objects.get(username='admin')
+                temp = Post.objects.create(author=user)
+                temp.title = 'Video'
+                temp.text = 'This is a video'
+                temp.videoname = i
+                if (i[:-3]+"en.vtt") in os.listdir():
+                   temp.subtitles = i[:-3]+"en.vtt"
+                temp.real = 0 
+                temp.save()
+       
+        os.chdir('/root/DjangoNetwork/media/videos/temp/') 
+        for i in os.listdir():
+            if i[-3:] == 'mp4':
+                try:
+                    user = User.objects.get(username='admin')
+                    temp = Post.objects.create(author=user)
+                    temp.title = 'Video'
+                    temp.text = 'This is a video'
+                    temp.videoname = i
+                    if (i[:-3]+"en.vtt") in os.listdir():
+                        temp.subtitles = i[:-3]+"en.vtt"
+                    temp.real = 1
+                    temp.save()
+                except:
+                    pass
+    '''
+    '''
+
+    for i in range(5):
             user = User.objects.get(username='vic')
             temp = Post.objects.create(author=user)
-            temp.title = 'Video'
-            temp.text = 'This is a video'
-            temp.videoname = i
-            if (i[:-3]+"en.vtt") in os.listdir():
-                temp.subtitles = i[:-3]+"en.vtt"
+            temp.title = 'Fake'
+            temp.text = 'This is a fake post'
+            temp.real = 0
             temp.save()
-    '''   
-    
-
-    # if datetime.datetime.now().hour > 12:
+   '''
+ # if datetime.datetime.now().hour > 12:
     #    return render(request,'twitterclone/end.html')
     d = {}
     print(request.POST)
     followerscount = {}
+    '''
     for user in User.objects.all():
         temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
         temp2 = 1 - abs(user.profile.credibilityscore)
@@ -41,8 +68,19 @@ def home(request):
         temp = User.objects.get(username=user.username)
         temp.profile.credibilityscore = d[user.username]
         temp.save()
-
+    '''
     if request.user.is_authenticated:
+
+        for user in User.objects.all():
+            temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+            temp2 = 1 - abs(user.profile.credibilityscore)
+            temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+   
+            d[user.username] = temp / (temp + temp2 * temp3)
+         
+            temp = User.objects.get(username=user.username)
+            temp.profile.credibilityscore = d[user.username]
+            temp.save()
         if request.method == 'POST':
             try:
                 follow = request.POST['follows']
@@ -95,6 +133,7 @@ def home(request):
                 post = Post.objects.get(pk=request.POST['unique'])
                 if post.author != user and request.POST['unique'] not in user.profile.liked:
                     post.likes += 1
+                    post.updated = datetime.datetime.now()
                     post.save()
                     if post.real == 0:
                         user.profile.fake = user.profile.fake + 1
@@ -121,6 +160,9 @@ def home(request):
                 newcomment = Comment.objects.create(author=request.user)
                 newcomment.post = Post.objects.get(pk=request.POST['submit'])
                 newcomment.text = comment
+                temp = Post.objects.get(pk=request.POST['submit'])
+                temp.updated = datetime.datetime.now()
+                temp.save()
                 newcomment.save()
                 for user in User.objects.all():
                     if request.user.username in user.profile.following.split(" "):
@@ -161,7 +203,9 @@ def home(request):
         finaloutput = []
         temp = (Profile.objects.all().order_by('-credibilityscore'))[:15]
         dictionary = {}
-      
+        print(postlist)
+        postlist.sort(key=lambda r:r.updated,reverse=True) 
+        print(postlist)
         for i in User.objects.all():
             for z in set(i.profile.following.split(" ")):
                 try:
@@ -219,8 +263,26 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'twitterclone/signup.html', {'form': form})
+def instructions(request):
 
+    return render(request,'twitterclone/instructions.html')
+def survey(request):
+   
+    temp = User.objects.get(pk=request.user.id)
+    context = {
+    'user': temp,
+    }
+    if request.method == 'POST':
+        form = forms.SurveyForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.author = request.user
+            instance.save()
 
+            return render(request,'twitterclone/final.html',context)
+    else: 
+        form = forms.SurveyForm()
+    return render(request,'twitterclone/survey.html',{'form':form})
 def addpost(request):
     if request.method == 'POST':
         form = forms.PostForm(request.POST)
@@ -263,8 +325,10 @@ def pick(request):
         user = User.objects.get(pk=request.user.id)
         user.profile.imagename = request.POST['hidden']
         user.save()
-    os.chdir('/home/datalab/Desktop/newDirDMT/DjangoNetwork/media/images')
+        return redirect('home')
+    os.chdir('/root/DjangoNetwork/media/images/')
     images = [i for i in os.listdir()[:15]]
+    images = [i for i in images if i[-3:] != 'jpg']
     context = {
         'images': images,
         'user': request.user,
@@ -272,7 +336,12 @@ def pick(request):
     print(context)
     return render(request, 'twitterclone/settings.html', context)
 
-
+def final(request):
+    temp = User.objects.get(pk=request.user.id)
+    context = {
+    'user': temp,
+    }
+    return render(request, 'twitterclone/final.html',context)
 def pm(request):
     if request.method == 'POST':
         temp = Message.objects.create(text=request.POST['message'])

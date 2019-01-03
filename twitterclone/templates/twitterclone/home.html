@@ -13,6 +13,10 @@
 
     			</li>
     			
+    			<li>
+    				<a class="nav-link" href="/instructions/"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Instructions</a>
+
+    			</li>
     
     	</ul>
     	<div>
@@ -29,20 +33,17 @@
      	 <button class="btn btn-secondary dropdown-toggle btn-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
       	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 					
-						<a class="dropdown-item" href="/{{request.user.username}}/">Profile</a>
 						<a class="dropdown-item" href="settings/">Settings</a>
-						<a class="dropdown-item" href="/logout/">Logout</a>
 					</div>
 				</div>
 				 <form class="navbar-form" role="search">
-      				<div class="input-group">
-        			<input type="text" class="form-control input-search" placeholder="Search Twitter" name="srch-term" id="srch-term">
         			<div class="input-group-btn">
           			<button class="btn btn-default btn-search" type="submit"><i class="fas fa-search"></i></button>
         			</div>
      			 	</div>
     				</form>
-				<a class="btn btn-search-bar" href="/create/" role="button">Tweet</a>
+				<a class = "btn btn-search-bar" href="/final/" role="button">Code for mturk </a>
+				<a class="btn btn-search-bar" href="/create/" role="button">Post</a>
 			</ul>
 		</div>
 	</div>
@@ -94,7 +95,7 @@
 			</div>
 			
 			<div align="center">
-			Credibility : 		{{eachuser.0.profile.credibilityscore}}
+			Credibility : 		{{eachuser.0.profile.credibilityscore|floatformat:3}}
 			</div>
 			<br/>
 			<div align="center">
@@ -177,15 +178,17 @@
 							<strong>Make a reply</strong>
 						</div>
 						<div class="modal-body">
-							<div class="form-group">
+							<div class="form-group" align='center'>
 								<form class = '' method='post'>
 								{%csrf_token%}
 								<div class='input-field' align="center">
 									<input id={{eachpost.id}} type='text' name='placeholder'>
 									<label for={{eachpost.id}}> <i class="fas fa-comment-alt"></i> </label>
 								</div>
-								<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
-								</form>
+								<div align='center'>
+								<button type='submit'  name='submit' value={{eachpost.id}} >Comment</button>
+								</div>								
+</form>
 							</div>
 						</div>
 						<div class="modal-footer">
@@ -213,7 +216,7 @@
 					</div>
 				<div align="center">
 
-				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
+				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">Repost</i></button>
 				</div>
 			</form>
 

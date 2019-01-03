@@ -52,18 +52,9 @@
 	<div class="row justify-content-md-center">
 		<!-- 1st column -->
 		<div align="center">
-			<h3 align="center"><span style="padding-right: 10px; padding-left:10px;"> Click to change	 your profile picture </span></h3>
-		<div class="col-md-auto" style='background-color:#fff;' align="center">
-		{% for image in images %}
-		<br/>
-				<form action = '' method = 'post'>
-		    		{%csrf_token%}
-		    		<input type="hidden" name="hidden" value="{{image}}">
-		    		<input type="image" src="{{ MEDIA_URL }}images/{{image}}" >
-				</form>
-		<br/>
-		{%endfor%}
+		    		<input type="image" src="{{ MEDIA_URL }}images/page1.jpg" >
 		
+		    		<input type="image" src="{{ MEDIA_URL }}images/page2.jpg" >
 		</div>
 	</div>
 </div>

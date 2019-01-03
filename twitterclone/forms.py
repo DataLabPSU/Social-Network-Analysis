@@ -1,7 +1,10 @@
 from django import forms
-from twitterclone.models import Post
+from twitterclone.models import Post,Survey
 
-
+class SurveyForm(forms.ModelForm):
+        class Meta:
+                model = Survey
+                fields = ['age','gender','suggestions']
 class PostForm(forms.ModelForm):
 	class Meta:
 		model = Post

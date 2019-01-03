@@ -9,7 +9,9 @@ path('',views.home,name='home'),
 path('create/',views.addpost,name='addpost'),
 path('notification/', views.notification, name='notification'),
 path('settings/',views.pick,name='settings'),
-path('pm/',views.pm,name='pm')
+path('pm/',views.pm,name='pm'),
+path('instructions/',views.instructions,name='instructions'),
+path('final/',views.survey,name='survey')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 
