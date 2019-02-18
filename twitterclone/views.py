@@ -7,69 +7,105 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 import datetime
-import os
+import random, os
 
+def processdata(request):
+	users = User.objects.all()
+	edgelist_format = '{userid} {followingid}'
+	labellist_format = '{userid} {labelx}'
+	grouplist = {'Group-0' : 'Audioless',
+				'Group-1' : 'International News',
+				'Group-2' : 'Domestic News',
+				'Group-3' : 'Political',
+				'Group-4' : 'Healthcare',
+				'Group-5' : 'Random',
+				'Group-6' : 'Face-altered',
+				'Group-7' : 'Fake',
+				'Group-8' : 'Advertisement',
+				'Group-9' : 'Sports',
+				'Group-10' : 'Movie',
+				'Group-11' : 'Education'}
 
-def home(request):
-	#if request.user == User.objects.get(username='root'): 
-	#	Share.objects.filter().delete()
-	'''
-	if request.user == User.objects.get(username='admin'):  
+	for user in users:
+		following = user.profile.following
+		labels = user.profile.labels
+		userid = (str)(user.id)
+		following = following.split(' ')
+		for follower in following:
+			followerid = (str)(users.get(username=follower).id)
+			print(userid + ' ' + followerid)
+		#print(userid + ' ' + following)
+		#print(userid + ' ' + labels)
+		print('\n\n')
+
+def deletevideos(request):
+	# delete all videos and shares
+	if request.user == User.objects.get(username='root'):
+		Post.objects.filter().delete()
+		Share.objects.filter().delete()
+	return redirect('home')
+
+def addvideos(request):
+	# add videos script
+	if request.user == User.objects.get(username='root'):  
 		os.chdir('media/videos/')
-		for i in os.listdir():
-			if i[-3:] == 'mp4':
+		vids = os.listdir()
+		
+		# shuffle order of videos
+		random.shuffle(vids)
+
+		# video labels formatting:
+		# <video_id>. <label1>, <label2>...
+		# ex: 3. Audioless, Advertisement, Face-altered
+		#fake video labels
+		f = open("Fake_Video_Labels.txt", "r")
+		fake_labels = f.readlines()
+		f.close()
+
+		#real video labels
+		t = open("True_Video_Labels.txt", "r")
+		true_labels = t.readlines()
+		t.close()
+
+		# allowed video extensions
+		allowed_ext = ['mp4', 'mov']
+
+		for i in vids:
+			if i[-3:] in allowed_ext:
+
+				# determine if video is fake or not from filename
+				isFake = 'Fake' in i
+
+				# create new post for admin
 				user = User.objects.get(username='admin')
 				temp = Post.objects.create(author=user)
 				temp.title = 'Video'
 				temp.text = 'This is a video'
 				temp.videoname = i
 
-				# fetch video label
+				# fetch video id
 				videoid = i[:-3].split('_')[-1]
-				f = open("Fake_Video_Labels.txt", "r")
-				videos = f.readlines()
-				for video in videos:
-					if videoid in video:
-						videolabel = video
+
+				# determine video label from label list
+				labels = fake_labels if isFake else true_labels
+				for label in labels:
+					if videoid in label:
+						videolabel = label
 						break
 				
 				# add video label
 				temp.videolabels = videolabel.split('.')[-1].strip()  
 
+				# add subtitles if provided
 				if (i[:-3]+"en.vtt") in os.listdir():
 				   temp.subtitles = i[:-3]+"en.vtt"
-				temp.real = 0 
-				temp.save()
-	   	
-		os.chdir('temp/') 
-		for i in os.listdir():
-			if i[-3:] == 'mp4':
-				try:
-					user = User.objects.get(username='admin')
-					temp = Post.objects.create(author=user)
-					temp.title = 'Video'
-					temp.text = 'This is a video'
-					temp.videoname = i
-					
-					# fetch video label
-					videoid = i[:-3].split('_')[-1]
-					f = open("True_Video_Labels.txt", "r")
-					videos = f.readlines()
-					for video in videos:
-						if videoid in video:
-							videolabel = video
-							break
-					
-					# add video label
-					temp.videolabels = videolabel.split('.')[-1].strip()  
 
-					if (i[:-3]+"en.vtt") in os.listdir():
-						temp.subtitles = i[:-3]+"en.vtt"
-					temp.real = 1
-					temp.save()
-				except:
-					pass
-	'''
+				# based on isFake, 0 for fake 1 for real
+				temp.real = 0 if isFake else 1 
+				temp.save()
+	return redirect('home')
+
+def home(request):
 	'''
 	for i in range(5):
 			user = User.objects.get(username='vic')
@@ -107,10 +143,15 @@ def home(request):
 		 
 			temp = User.objects.get(username=user.username)
 			temp.profile.credibilityscore = d[user.username]
+			#temp.profile.labels = ""
 			temp.save()
+
 		if request.method == 'POST':
 			try:
 				follow = request.POST['follows']
+				# don't allow users to follow admin
+				if follow == "admin":
+					pass
 				user = request.user
 				user.profile.following = user.profile.following + " " + follow
 				user.save()
@@ -119,6 +160,9 @@ def home(request):
 
 			try:
 				postid = request.POST['share']
+				if postid == '':
+					pass
+
 				post = Post.objects.get(id=postid)
 				if request.user != post.author:
 					newshare = Share.objects.create(shared=request.user)
@@ -179,7 +223,7 @@ def home(request):
 					user.profile.liked = ' '.join(temp)
 
 					# remove first instance of post videolabels 
-					user.profile.labels.replace(post.videolabels + "|", "", 1)
+					user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
 					print(user.profile.labels)
 					post.likes -= 1
 					if post.real == 0:
@@ -192,6 +236,9 @@ def home(request):
 				pass
 			try:
 				comment = request.POST['placeholder']
+				if not comment:
+					pass
+					
 				newcomment = Comment.objects.create(author=request.user)
 				newcomment.post = Post.objects.get(pk=request.POST['submit'])
 				newcomment.text = comment
@@ -210,19 +257,33 @@ def home(request):
 		posts = Post.objects.filter(author=request.user)
 		postlist = list(posts)
 		shares = Share.objects.filter(shared=request.user)
+		
+		# append retweets to postlist
 		for z in shares:
 			content = Post.objects.get(id=z.postid)
-			content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
+			if content.author.username == 'admin':
+				content.author.username = 'Video Retweeted by ' + z.shared.username
+			else:
+				content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
 			content.created_date = z.date
 			content.sharecomment = z.comment
 
 			postlist.append(content)
+
 		comments = Comment.objects.all()
+
+		# following
 		if user.profile.following != "":
+			user.profile.following = user.profile.following + " admin"
 			for i in set(user.profile.following.split(" ")):
 				if i != "":
-				   
+
+					#skip appending admin posts
+					#if i == "admin":
+					#	continue
+
 					following = User.objects.get(username=i)
+
 					otherposts = Post.objects.filter(author=following)
 					posts = posts | otherposts
 					postlist.extend(list(otherposts))
@@ -238,16 +299,26 @@ def home(request):
 		finaloutput = []
 		temp = (Profile.objects.all().order_by('-credibilityscore'))[:15]
 		dictionary = {}
-		print(postlist)
+		#print(postlist)
 		postlist.sort(key=lambda r:r.updated,reverse=True) 
-		print(postlist)
+		#print(postlist)
+
+
 		for i in User.objects.all():
+			# skip admins
+			if i.username == 'admin':
+				continue
+
 			for z in set(i.profile.following.split(" ")):
 				try:
 				   dictionary[z] += 1
 				except:
 				   dictionary[z] = 1
 		for i in temp:
+			#skip admin
+			if i.user.username == 'admin':
+				continue
+
 			if i.user != request.user and i.user.username not in request.user.profile.following.split(" "):
 				 
 				 try:
@@ -266,7 +337,9 @@ def home(request):
 			if i[0] in following:
 				finaloutput.remove([i[0],i[1]])
 		
+		mainvids = Post.objects.filter(author=User.objects.get(username='admin'))
 		context = {
+			'mainvids': mainvids,
 			'posts': postlist,
 			'comments': comments,
 			'FOLLOWING': following,
@@ -286,7 +359,6 @@ def home(request):
 		return render(request, "twitterclone/agree.html")
 		#return redirect('login')
 
-
 def signup(request):
 	if request.method == 'POST':
 		form = UserCreationForm(request.POST)
@@ -300,9 +372,10 @@ def signup(request):
 	else:
 		form = UserCreationForm()
 	return render(request, 'twitterclone/signup.html', {'form': form})
-def instructions(request):
 
+def instructions(request):
 	return render(request,'twitterclone/instructions.html')
+
 def survey(request):
    
 	temp = User.objects.get(pk=request.user.id)
@@ -320,6 +393,7 @@ def survey(request):
 	else: 
 		form = forms.SurveyForm()
 	return render(request,'twitterclone/survey.html',{'form':form})
+
 def addpost(request):
 	if request.method == 'POST':
 		form = forms.PostForm(request.POST)
@@ -356,7 +430,6 @@ def testfollow(request):
 	}
 	return render(request, 'twitterclone/follow.html', context)
 
-
 def pick(request):
 	if request.method == 'POST':
 		user = User.objects.get(pk=request.user.id)
@@ -379,6 +452,7 @@ def final(request):
 	'user': temp,
 	}
 	return render(request, 'twitterclone/final.html',context)
+
 def pm(request):
 	if request.method == 'POST':
 		temp = Message.objects.create(text=request.POST['message'])

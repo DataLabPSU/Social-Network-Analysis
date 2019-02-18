@@ -11,7 +11,10 @@ path('notification/', views.notification, name='notification'),
 path('settings/',views.pick,name='settings'),
 path('pm/',views.pm,name='pm'),
 path('instructions/',views.instructions,name='instructions'),
-path('final/',views.survey,name='survey')
+path('final/',views.survey,name='survey'),
+path('processdata/', views.processdata,name='processdata'),
+path('deletevideos/', views.deletevideos,name='deletevideos'),
+path('addvideos/', views.addvideos,name='addvideos')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 
