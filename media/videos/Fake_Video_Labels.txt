@@ -1,0 +1,31 @@
+1. Audioless, International News, Face-altered
+2. Audioless, Domestic News, Face-altered
+3. Audioless, Advertisement, Face-altered
+4. Audioless, Advertisement, Face-altered 
+5. Audioless, International News, Face-altered
+6. Audioless, International News, Face-altered
+7. Audioless, International News, Face-altered
+8. Audioless, Domestic News, Face-altered
+9. Audioless, Domestic News, Face-altered
+10. Faked, Random
+11. Faked, Domestic News
+12. International News, Face-altered
+13. Fake, Random
+14. Fake, Random
+15. Fake, Political
+16. International News, Fake
+17. Fake, Political
+18. Random, Movie
+19. Fake, Political
+20. Audioless, Domestic News, Business, Face-altered
+21. Audioless, Domestic News, Political, Face-altered
+22. Audioless, Domestic News, Business, Face-altered
+23. Audioless, Domestic News, Business, Face-altered
+24. Audioless, Domestic News, Business, Face-altered
+25. Audioless, Advertisement, Face-altered
+26. Audioless, International News, Face-altered
+27. Audioless, Domestic News, Healthcare, Face-altered
+28. Audioless, Domestic News, Healthcare, Face-altered
+29. Audioless, Domestic News, Sports, Face-altered
+30. Audioless, International News, Face-altered
+

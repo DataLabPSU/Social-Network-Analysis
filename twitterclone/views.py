@@ -12,31 +12,56 @@ import random, os
 def processdata(request):
 	users = User.objects.all()
 	edgelist_format = '{userid} {followingid}'
-	labellist_format = '{userid} {labelx}'
-	grouplist = {'Group-0' : 'Audioless',
-				'Group-1' : 'International News',
-				'Group-2' : 'Domestic News',
-				'Group-3' : 'Political',
-				'Group-4' : 'Healthcare',
-				'Group-5' : 'Random',
-				'Group-6' : 'Face-altered',
-				'Group-7' : 'Fake',
-				'Group-8' : 'Advertisement',
-				'Group-9' : 'Sports',
-				'Group-10' : 'Movie',
-				'Group-11' : 'Education'}
+	labellist_format = '{userid} {label_x}'
+	grouplist = {'Audioless': 0,
+				'International News' : 1,
+				'Domestic News' : 2,
+				'Political' : 3,
+				'Healthcare' : 4,
+				'Random' : 5,
+				'Face-altered' : 6,
+				'Fake' : 7,
+				'Advertisement' : 8,
+				'Sports' : 9,
+				'Movie' : 10,
+				'Education' : 11}
 
-	for user in users:
-		following = user.profile.following
-		labels = user.profile.labels
-		userid = (str)(user.id)
-		following = following.split(' ')
-		for follower in following:
-			followerid = (str)(users.get(username=follower).id)
-			print(userid + ' ' + followerid)
-		#print(userid + ' ' + following)
-		#print(userid + ' ' + labels)
-		print('\n\n')
+	pdatadir = 'postdata/'
+	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
+	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
+	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
+
+	with open(pedgelist_file, 'w') as edgefile:
+		for user in users:
+			following = user.profile.following
+			userid = (str)(user.id)
+			following = following.split(' ')
+
+			for follower in following:
+				followerid = (str)(users.get(username=follower).id)
+				edgefile.write(userid + ' ' + followerid + '\n')
+			#print(userid + ' ' + following)
+			#print(userid + ' ' + labels)
+			#print('\n\n')
+
+	with open(plabellist_file, 'w') as labelfile:
+		for user in users:
+			labels = user.profile.labels
+			if labels == "":
+				continue
+
+			userid = (str)(user.id)
+			labels = labels.replace("|", ",")
+			labels = labels.split(",")
+			groupids = []
+			for label in labels:
+				if label and grouplist[label.strip()]:
+					groupids.append(grouplist[label.strip()])
+			gids = list(set(groupids))
+			labelline = userid + " " + " ".join(str(x) for x in gids)
+			labelfile.write(labelline + '\n')
+
+	return render(request,'twitterclone/agree.html')
 
 def deletevideos(request):
 	# delete all videos and shares
@@ -150,7 +175,7 @@ def home(request):
 			try:
 				follow = request.POST['follows']
 				# don't allow users to follow admin
-				if follow == "admin":
+				if not follow or follow == "admin":
 					pass
 				user = request.user
 				user.profile.following = user.profile.following + " " + follow
@@ -160,7 +185,7 @@ def home(request):
 
 			try:
 				postid = request.POST['share']
-				if postid == '':
+				if not postid:
 					pass
 
 				post = Post.objects.get(id=postid)
@@ -238,7 +263,7 @@ def home(request):
 				comment = request.POST['placeholder']
 				if not comment:
 					pass
-					
+
 				newcomment = Comment.objects.create(author=request.user)
 				newcomment.post = Post.objects.get(pk=request.POST['submit'])
 				newcomment.text = comment
@@ -262,7 +287,7 @@ def home(request):
 		for z in shares:
 			content = Post.objects.get(id=z.postid)
 			if content.author.username == 'admin':
-				content.author.username = 'Video Retweeted by ' + z.shared.username
+				content.author.username = 'Retweeted by ' + z.shared.username
 			else:
 				content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
 			content.created_date = z.date
@@ -274,13 +299,12 @@ def home(request):
 
 		# following
 		if user.profile.following != "":
-			user.profile.following = user.profile.following + " admin"
 			for i in set(user.profile.following.split(" ")):
 				if i != "":
 
 					#skip appending admin posts
-					#if i == "admin":
-					#	continue
+					if i == "admin":
+						continue
 
 					following = User.objects.get(username=i)
 
@@ -290,7 +314,10 @@ def home(request):
 					sharedposts = Share.objects.filter(shared=following)
 					for z in sharedposts:
 						content = Post.objects.get(id=z.postid)
-						content.author.username = content.author.username + ' Shared by ' + z.shared.username
+						if content.author.username == "admin":
+							content.author.username =  'Shared by ' + z.shared.username
+						else:
+							content.author.username = content.author.username + ' Shared by ' + z.shared.username
 						content.created_date = z.date
 						content.sharecomment = z.comment
 						postlist.append(content)
