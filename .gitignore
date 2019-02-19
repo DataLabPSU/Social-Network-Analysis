@@ -1,0 +1,12 @@
+.idea/
+
+#python
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+
+#video files
+*.mp4
+*.mov
+*.en.vtt

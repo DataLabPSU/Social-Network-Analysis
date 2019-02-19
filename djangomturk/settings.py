@@ -25,7 +25,7 @@ SECRET_KEY = 'cspotpxpelh!a*xo)*r-8w_cv6_*37s$w08h5y8po@lk5kzt25'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['067c5b72.ngrok.io', '127.0.0.1']
+ALLOWED_HOSTS = ['cloud.digitalocean.com','socialnetdata.org','68.183.18.150','067c5b72.ngrok.io', '127.0.0.1','localhost','337cee9e.ngrok.io']
 
 
 # Application definition
@@ -33,11 +33,12 @@ ALLOWED_HOSTS = ['067c5b72.ngrok.io', '127.0.0.1']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'twitterclone',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'twitterclone',
+   
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'djangomturk.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['./templates', ],
+        'DIRS': ['./templates','../templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

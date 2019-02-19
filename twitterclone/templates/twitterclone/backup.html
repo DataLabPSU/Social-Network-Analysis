@@ -1,0 +1,280 @@
+{%extends './base_generic.html' %}
+{%block content%}
+{% load static %}
+
+<!-- Navigation bar -->
+<nav class="navbar border-bottom border-grey sticky-top navbar-expand-lg navbar-light" style="background-color: #fff;">
+	<div class="navbar-collapse collapse justify-content-between">
+    	<ul class="navbar-nav mr-auto">
+    			<li class="nav-item active">
+    				<a class="nav-link" href="../"><i class="fas fa-home" style="color:#8CCEF9;"></i> Home</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="/notification/"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Notifications</a>
+
+    			</li>
+    			<li>
+    				<a class="nav-link" href="#"><i class="fas fa-envelope" style="color:#8CCEF9;"></i> Messages</a>
+    			</li>
+    	</ul>
+		<a class="navbar-brand" href="#">
+			
+			<img src= "{% static 'images/logo.jpg' %}" width="80" height="40">
+			
+
+		</a>
+
+    	<ul class="navbar-nav">
+				
+<div class="dropdown navbar-user-dropdown">
+      <button class="btn btn-secondary dropdown-toggle btn-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					
+						<a class="dropdown-item" href="/{{request.user.username}}/">Profile</a>
+						<a class="dropdown-item" href="settings/">Settings</a>
+						<a class="dropdown-item" href="/logout/">Logout</a>
+					</div>
+				</div>
+				 <form class="navbar-form" role="search">
+      				<div class="input-group">
+        			<input type="text" class="form-control input-search" placeholder="Search Twitter" name="srch-term" id="srch-term">
+        			<div class="input-group-btn">
+          			<button class="btn btn-default btn-search" type="submit"><i class="fas fa-search"></i></button>
+        			</div>
+     			 	</div>
+    				</form>
+				<a class="btn btn-search-bar" href="/create/" role="button">Tweet</a>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<!-- Body of Home Page -->
+<div class='container'>
+	<div class="row justify-content-md-center">
+		<!-- 1st column -->
+		<div class="col-md-auto" style='background-color:#fff;'>
+			<div class="content-panel">
+          		<div class="panel-header">
+			<h3 align="center"><span style="padding-right: 10px; padding-left:10px;"> Who to follow </span></h3>
+				</div>
+			</div>
+			<hr/>
+
+			{%for eachuser in numfollowers %}
+			<form action='' method="post">
+			{%csrf_token%}
+			<div align="center">
+			<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+			</div>
+			<strong>
+			{{eachuser.0}}
+			</strong>
+			</div>
+			<div align="center">
+			{{ eachuser.1 }} Followers
+			</div>
+			
+			<div align="center">
+			Credibility : 		{{eachuser.0.profile.credibilityscore}}
+			</div>
+			<br/>
+			<div align="center">
+			<button type="submit" name="follows"  value={{eachuser.0}} class="btn btn-follow">Follow</button>
+
+			
+			</div>
+			</form>
+			<hr/>
+			{%endfor%}
+		</div>
+		<!-- 2nd column -->
+ 		<div class="col-6" style='background-color:#fff; margin-right: 10px; margin-left: 10px'>
+ 
+			{% for eachpost in posts %}
+			<br/>
+			{% if eachpost.sharecomment %}
+			<p>{{eachpost.sharecomment}}</p>
+			{% endif %}
+			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
+			<p align="center"> Title: {{eachpost.title}} </p>
+			-<p align="center">{{eachpost.text}}</p>
+
+			{% if eachpost.videoname %}
+			<video width="320" height="240" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
+				<source src="{{ MEDIA_URL }}/videos/{{eachpost.videoname}}" type="video/mp4">
+			</video>
+
+			<br/>
+			{% endif %}
+			{% for comment in comments%}
+			{% if comment.post == eachpost%}
+			<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
+			{% endif %}
+			{% endfor%}
+
+
+			<!-- <form class = '' method='post'>
+			{%csrf_token%}
+			<div class='input-field' align="center">
+				<input id={{eachpost.id}} type='text' name='placeholder'>
+				<label for={{eachpost.id}}> <i class="fas fa-comment-alt"></i> </label>
+			</div>
+			<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+			</form>
+			<br/> -->
+
+			<div class="tweet-footer" align="center">
+                <a class="tweet-footer-btn">
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentModal"> <i class="fas fa-comment-alt"></i> 
+					</button>
+					 </a>
+			
+				<a class="tweet-footer-btn">
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#retweetModal"><i class="fas fa-retweet"></i>
+					</button>
+				</a>
+
+			
+				<form action='' method='post'>
+					<a class="tweet-footer-btn">
+					{%csrf_token%}
+					<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+					</button>
+					</a>
+				</form>
+			</div>
+
+				<div class="modal fade" id="commentModal">
+				<div class="modal-dialog modal-dialog-centered" role="dialog">
+					<div class="modal-content">
+						<div class="modal-header" align="center">
+							<strong>Make a reply</strong>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<form class = '' method='post'>
+								{%csrf_token%}
+								<div class='input-field' align="center">
+									<input id={{eachpost.id}} type='text' name='placeholder'>
+									<label for={{eachpost.id}}> <i class="fas fa-comment-alt"></i> </label>
+								</div>
+								<input type='submit'  name='submit' value={{eachpost.id}} style='position:absolute;left:-99999px'/>
+								</form>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+				</div>
+
+
+
+
+			
+			<!-- <form action='' method='post'>
+			{%csrf_token%}
+			<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+			</button>
+			</form> -->
+			
+
+			<!-- <form action='' method='post'>
+				{%csrf_token%}
+					<div class='input-field' align="center">
+						<input id={{eachpost.id}} type='text' name='sharecomment'>
+					</div>
+				<div align="center">
+
+				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
+				</div>
+			</form>
+ -->
+			<!-- <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#retweetModal"><i class="fas fa-retweet">
+				RetweetModel test
+			</i>
+			</button> -->
+
+			<div class="modal fade" id="retweetModal">
+				<div class="modal-dialog modal-dialog-centered" role="dialog">
+					<div class="modal-content">
+						<div class="modal-header" align="center">
+							<strong>Retweet this to your followers?</strong>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<form action='' method='post'>
+									
+									{%csrf_token%}
+									<div class='input-field' align="center">
+										<input id={{eachpost.id}} type='text' name='sharecomment' form="modal-form">
+									</div>
+								</br>
+									<div align="center">
+										<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">  Retweet</i></button>
+									</div>
+								
+								</form>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+
+
+			<hr/>
+			{% endfor %}
+		</div>
+	
+		<!-- column 3 -->
+		<div class="col-md-auto" style='background-color:#fff;'>
+			<div class="content-panel">
+          		<div class="panel-header">
+          			<div align="center">
+          				<h4 align="center">{{request.user.username}}</h4>
+          				<div align="center">
+          					<input type="image" style="height: 40px;width: 40px;border-radius: 50%;" src="{{ MEDIA_URL }}images/{{image}}.jpeg" >
+						</div>
+					</div>
+					<div align="center">
+          				{{curfollowersnum}} Following
+          				<br/>
+          				{{curfolloweesnum}} Followers
+          			</div>
+          		</div>
+          		<hr/>   	
+				<h4 align="center" > <span style="padding-right: 10px; padding-left:10px;">Following</span> </h4>
+			
+			
+			<hr/>
+
+			{% for follower in FOLLOWING%}
+			<form action='' method='post'>
+			{%csrf_token%}
+			<div align="center">
+				<div align="center" style="height: 30px;width: 30px;border-radius: 50%;background-image:url({{ MEDIA_URL}}images/{{eachuser.0.profile.imagename}}.jpeg);">
+				</div>
+			<strong>
+				{{follower.username}}
+			</strong>
+			</div>
+			<br/>
+			<div align="center">
+				<button type="submit" name="follow" value="{{follower.username}}" class="btn btn-follow">Unfollow</button>
+
+			</div>
+			</form>
+			<hr/>
+			
+			{% endfor%}
+		</div>
+	</div>
+	</div>
+			{%endblock%}
+

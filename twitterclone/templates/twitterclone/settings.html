@@ -1,0 +1,71 @@
+{% extends './base_generic.html' %}
+{% load static %}
+{% block content %}
+<!-- Navigation bar -->
+<nav class="navbar border-bottom border-grey sticky-top navbar-expand-lg navbar-light" style="background-color: #fff;">
+	<div class="navbar-collapse collapse justify-content-between">
+    	<ul class="navbar-nav mr-auto">
+    			<li class="nav-item active">
+    				<a class="nav-link" href="../"><i class="fas fa-home" style="color:#8CCEF9;"></i> Home</a>
+    			</li>
+    			<li>
+    				<a class="nav-link" href="/notification/"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Notifications</a>
+
+    			</li>
+    			<li>
+    			</li>
+    	</ul>
+			
+			
+
+
+    	<ul class="navbar-nav">
+				
+<div class="dropdown navbar-user-dropdown">
+      <button class="btn btn-secondary dropdown-toggle btn-circle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					
+						<a class="dropdown-item" href="#">Settings</a>
+					</div>
+				</div>
+				 <form class="navbar-form" role="search">
+        			<div class="input-group-btn">
+          			<button class="btn btn-default btn-search" type="submit"><i class="fas fa-search"></i></button>
+        			</div>
+     			 	</div>
+    				</form>
+				<a class="btn btn-search-bar" href="/create/" role="button">Post</a>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+
+
+<!--<form action = '' method = 'post'>
+    {%csrf_token%}
+    <input type="hidden" name="hidden" value="image0.jpeg">
+    <input type="image"  src="{{ MEDIA_URL }}/images/{{user.profile.imagename}}" >
+</form> -->
+
+<div class='container'>
+	<div class="row justify-content-md-center">
+		<!-- 1st column -->
+		<div align="center">
+			<h3 align="center"><span style="padding-right: 10px; padding-left:10px;"> Click to change	 your profile picture </span></h3>
+		<div class="col-md-auto" style='background-color:#fff;' align="center">
+		{% for image in images %}
+		<br/>
+				<form action = '' method = 'post'>
+		    		{%csrf_token%}
+		    		<input type="hidden" name="hidden" value="{{image}}">
+		    		<input type="image" src="{{ MEDIA_URL }}images/{{image}}" >
+				</form>
+		<br/>
+		{%endfor%}
+		
+		</div>
+	</div>
+</div>
+
+{% endblock%}

@@ -1,0 +1,23 @@
+{% extends './base_generic.html'%}
+{% block content%}
+ 	<div class="container">
+		<h2> Fill out this short survey to get your final code </h2>
+
+    <p>Before you exit the study, we encourage you to read the following.</p>
+
+    <p>To all participants: <br>
+
+      We would like to debrief you on the true nature of the videos. The primary objective of the study is to disseminate doctored/machine altered and authentic videos via a social media network to study the impact of spread of mis-information and the ability of humans to readily identify doctored media versus the authentic counter parts. The study you have completed contains authentic and doctored media in a 50:50 ratio. Please re-verify all the facts and do not assume any or all information you’ve been exposed to as that retrieved from a valid source.
+    </p>
+
+    <p>You may choose to have your data withdrawn in case you found the study to be misleading in any way. Please check the option below in case you wish you withdraw your data. All data collected will be utilized for the dissemination of scientific articles only. Thank you for your participation.</p>
+
+		<div align='center'>
+  		<form method='post'>
+  		{% csrf_token%}
+  		{{form.as_p}}
+  		<button type='submit'> Submit </button>
+		</div>
+	</div>
+	<br>
+{%endblock%}
