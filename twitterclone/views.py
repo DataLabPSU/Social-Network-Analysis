@@ -161,7 +161,7 @@ def loadtest(request):
 	posts = Post.objects.all()
 	for user in users:
 		for post in posts:
-			likepost(user, post)
+			likepost(request, user, post)
 	return render(request,'twitterclone/agree.html')
 
 def processdata(request):
