@@ -68,23 +68,24 @@ def updatelike(request):
 def sharepost(request):
 	try:
 		postid = request.GET.get('postid')
+		sharecomment = request.GET.get('sharecomment')
 		if not postid:
 			pass
 
 		post = Post.objects.get(id=postid)
 		if request.user != post.author and request.user.username not in post.text:
-			if request.GET.get('sharecomment') == '':
+			if sharecomment == '':
 				post.text = post.text + '\n' + 'Post shared by ' + request.user.username
 			else:
-				post.text = post.text + '\n' + 'Post shared by ' + request.user.username + ' with comment ' + request.GET.get('sharecomment')
+				post.text = post.text + '\n' + 'Post shared by ' + request.user.username + ' with comment ' + sharecomment
 			
-			# newshare = Share.objects.create(shared=request.user)
-			# newshare.postid = postid 
-			# try:
-			#  	newshare.comment = request.POST['sharecomment']
-			# except Exception as e:
-			#  	print(str(e))
-			#  	pass
+			newshare = Share.objects.create(shared=request.user)
+			newshare.postid = postid 
+			try:
+			 	newshare.comment = sharecomment
+			except Exception as e:
+			 	print(str(e))
+			 	pass
 
 			# newshare.save()
 			user = request.user
@@ -113,7 +114,6 @@ def sharepost(request):
 	return JsonResponse(data)
 
 def processdata(request):
-	print('test')
 	users = User.objects.all()
 	edgelist_format = '{userid} {followingid}'
 	labellist_format = '{userid} {label_x}'
@@ -134,7 +134,11 @@ def processdata(request):
 	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
 	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
+	pimpressions_file = pdatadir + 'impressions_' + timenow + '.txt'
 
+	# edgelist
+	# format: <userid> <following1>
+	#		  <userid> <following2>
 	with open(pedgelist_file, 'w') as edgefile:
 		for user in users:
 			try:
@@ -145,22 +149,24 @@ def processdata(request):
 				for follower in following:
 					followerid = (str)(users.get(username=follower).id)
 					edgefile.write(userid + ' ' + followerid + '\n')
-			except:
-				pass	
+			except Exception as e:
+			 	print(str(e))
+			 	pass	
 			#print(userid + ' ' + following)
 			#print(userid + ' ' + labels)
 			#print('\n\n')
 
+	# labellist
+	# format: <userid> <label1> <label2> <label3>
 	with open(plabellist_file, 'w') as labelfile:
 		for user in users:
 			try:
 				labels = user.profile.labels
-				userid = (str)(user.id)
+				userid = str(user.id)
 				if labels == "":
 					labelfile.write(userid + '\n')
 					continue
 
-				
 				labels = labels.replace("|", ",")
 				labels = labels.split(",")
 				groupids = []
@@ -170,8 +176,26 @@ def processdata(request):
 				gids = list(set(groupids))
 				labelline = userid + " " + " ".join(str(x) for x in gids)
 				labelfile.write(labelline + '\n')
-			except:
-				pass
+			except Exception as e:
+			 	print(str(e))
+			 	pass
+
+	# followers and likes list
+	# format: <userid> <following> <followers>
+	with open(pimpressions_file, 'w') as impressionsfile:
+		for user in users:
+			try:
+				userid = str(user.id)
+				following = len(user.profile.following.split(" "))
+				followeenum = 0
+				for i in users:
+					if user.username in i.profile.following.split(" "):
+						followeenum += 1
+				impressionsline = userid + ' ' + str(following) + ' ' + str(followeenum)
+				impressionsfile.write(impressionsline + '\n')
+			except Exception as e:
+			 	print(str(e))
+			 	pass
 
 	return render(request,'twitterclone/agree.html')
 
