@@ -113,6 +113,56 @@ def sharepost(request):
 	
 	return JsonResponse(data)
 
+def likepost(request, user, post):
+	try:
+		if post.author != user and postid not in user.profile.liked:
+			post.likes += 1
+			# append video labels to user labels
+			user.profile.labels = user.profile.labels + post.videolabels + "|"
+			post.updated = datetime.datetime.now()
+
+			if post.real == 0:
+				user.profile.fake = user.profile.fake + 1
+			else:
+				user.profile.real = user.profile.real + 1
+			user.profile.liked = user.profile.liked + " " + postid
+			post.save()
+			user.save()
+		elif post.author != user and postid in user.profile.liked:
+			temp = user.profile.liked.split(" ")
+			temp.remove(postid)
+			user.profile.liked = ' '.join(temp)
+
+			# remove first instance of post videolabels 
+			user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
+			
+			post.likes -= 1
+			if post.real == 0:
+				user.profile.fake = user.profile.fake - 1
+			else:
+				user.profile.real = user.profile.real - 1
+			post.save()
+			user.save()
+	except:
+		pass
+
+	return True
+
+def createusers(request):
+	for i in range(0,501):
+		user = User.objects.create_user(username='user' + str(i),
+                                 email='',
+                                 password='glass' + str(i))
+
+	return render('home')
+
+def loadtest(request):
+	users = User.objects.all()
+	posts = Post.objects.all()
+	for user in users:
+		for post in posts:
+			likepost(user, post)
+
 def processdata(request):
 	users = User.objects.all()
 	edgelist_format = '{userid} {followingid}'
@@ -201,17 +251,33 @@ def processdata(request):
 
 	return render(request,'twitterclone/agree.html')
 
+# resets all user data for all users
+def resetuserdata(request):
+	# reset all user data except root and admin
+	if request.user == User.objects.get(username='admin'):
+		for user in User.objects.all():
+			user.profile.following = ''
+			user.profile.labels = ''
+			user.profile.real = 0
+			user.profile.fake = 0
+			user.profile.credibilityscore = 0.1
+			user.save()
+	
+	return redirect('home')
+
 # purges all data including users, posts, shares, comments
+# does not remove admin or root
 def deletedata(request):
 	# delete all users except root and admin
-	if request.user == User.objects.get(username='root'):
+	if request.user == User.objects.get(username='admin'):
 		deleteposts(request)
 		for user in User.objects.all():
-			if user.username in ['admin', 'root']:
+			if user.username in ['admin']:	#, 'root']:
 				user.profile.following = ''
 				user.profile.labels = ''
 				user.profile.real = 0
 				user.profile.fake = 0
+				user.profile.credibilityscore = 0.1
 				user.save()
 				continue
 			user.delete()
@@ -221,7 +287,7 @@ def deletedata(request):
 # purges all posts, shares, comments
 def deleteposts(request):
 	# delete all videos and shares
-	if request.user == User.objects.get(username='root'):
+	if request.user == User.objects.get(username='admin'):
 		Post.objects.filter().delete()
 		Share.objects.filter().delete()
 	return redirect('home')
@@ -229,7 +295,7 @@ def deleteposts(request):
 # adds videos
 def addvideos(request):
 	# add videos script
-	if request.user == User.objects.get(username='root'):  
+	if request.user == User.objects.get(username='admin'):  
 		os.chdir('media/videos/')
 		vids = os.listdir()
 		
@@ -314,18 +380,17 @@ def home(request):
 		temp.save()
 	'''
 	if request.user.is_authenticated:
-
 		for user in User.objects.all():
-			temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-			temp2 = 1 - abs(user.profile.credibilityscore)
+			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+			temp2 = 1 - 0.1
 			temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
    
 			d[user.username] = temp / (temp + temp2 * temp3)
-		 
+		 	
 			temp = User.objects.get(username=user.username)
 			temp.profile.credibilityscore = d[user.username]
-			#temp.profile.labels = ""
 			temp.save()
+		#print(d)
 
 		if request.method == 'POST':
 			try:
