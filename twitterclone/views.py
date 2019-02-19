@@ -154,7 +154,7 @@ def createusers(request):
                                  email='',
                                  password='glass' + str(i))
 
-	return render('home')
+	return render(request,'twitterclone/agree.html')
 
 def loadtest(request):
 	users = User.objects.all()
@@ -162,6 +162,7 @@ def loadtest(request):
 	for user in users:
 		for post in posts:
 			likepost(user, post)
+	return render(request,'twitterclone/agree.html')
 
 def processdata(request):
 	users = User.objects.all()
