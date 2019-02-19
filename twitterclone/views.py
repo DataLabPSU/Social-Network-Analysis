@@ -180,8 +180,8 @@ def processdata(request):
 			 	print(str(e))
 			 	pass
 
-	# followers and likes list
-	# format: <userid> <following> <followers>
+	# followers, likes, shares list
+	# format: <userid> <following> <followers> <numlikes> <numshares>
 	with open(pimpressions_file, 'w') as impressionsfile:
 		for user in users:
 			try:
@@ -191,7 +191,9 @@ def processdata(request):
 				for i in users:
 					if user.username in i.profile.following.split(" "):
 						followeenum += 1
-				impressionsline = userid + ' ' + str(following) + ' ' + str(followeenum)
+				numliked = len(user.profile.liked.split(" "))
+				numshares = Share.objects.filter(shared=user.id).count()
+				impressionsline = userid + ' ' + str(following) + ' ' + str(followeenum) + ' ' + str(numliked) + ' ' + str(numshares)
 				impressionsfile.write(impressionsline + '\n')
 			except Exception as e:
 			 	print(str(e))
