@@ -12,9 +12,12 @@ path('settings/',views.pick,name='settings'),
 path('pm/',views.pm,name='pm'),
 path('instructions/',views.instructions,name='instructions'),
 path('final/',views.survey,name='survey'),
+url(r'^ajax/updatelike/$', views.updatelike, name='updatelike'),
+url(r'^ajax/sharepost/$', views.sharepost, name='sharepost'),
 path('processdata/', views.processdata,name='processdata'),
-path('deletevideos/', views.deletevideos,name='deletevideos'),
-path('addvideos/', views.addvideos,name='addvideos')
+path('deleteposts/', views.deleteposts,name='deleteposts'),
+path('addvideos/', views.addvideos,name='addvideos'),
+path('deletedata/', views.deletedata,name='deletedata')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 

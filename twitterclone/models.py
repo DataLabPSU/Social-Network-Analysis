@@ -15,7 +15,6 @@ class Message(models.Model):
 	def __str(self):
 		return self.message
 
-
 class Post(models.Model):
 	author = models.ForeignKey(User, on_delete=models.CASCADE)
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -42,7 +41,6 @@ class Messages(models.Model):
 	text = models.TextField(default='')
 	time = models.DateTimeField(default=timezone.now)
 
-
 class Share(models.Model):
 	shared = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
 	postid = models.TextField()
@@ -63,11 +61,10 @@ class Comment(models.Model):
 
 	created_date = models.DateTimeField(default=timezone.now)
 
-
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	bio = models.TextField(max_length=500, blank=True)
-	following = models.TextField(max_length=1000, default='vic')
+	following = models.TextField(max_length=1000, default='')
 	liked = models.TextField(max_length=1000, blank=True)
 	notifications = models.IntegerField(default=1)
 	notificationsString = models.TextField(default='')

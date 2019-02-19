@@ -94,9 +94,9 @@
 			{{ eachuser.1 }} Followers
 			</div>
 			
-			<div align="center">
+<!-- 			<div align="center">
 			Credibility : 		{{eachuser.0.profile.credibilityscore|floatformat:3}}
-			</div>
+			</div> -->
 			<br/>
 			<div align="center">
 			<button type="submit" name="follows"  value={{eachuser.0}} class="btn btn-follow">Follow</button>
@@ -120,7 +120,7 @@
 
 			<p align="center"><strong>@{{eachpost.author}}</strong> on <em>{{eachpost.created_date}}</em></p>
 		
-			-<p align="center">{{eachpost.text}}</p>
+			<div align="center" id="{{eachpost.id}}-posttext" class="posttext">{{eachpost.text|linebreaks}}</div>
 
 			{% if eachpost.videoname %}
 			<video width="500" height="400" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
@@ -151,7 +151,7 @@
 
 			<div class="tweet-footer" align="center">
                 <a class="tweet-footer-btn">
-					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentModal"> <i class="fas fa-comment-alt"></i> 
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentModal-{{eachpost.id}}"> <i class="fas fa-comment-alt"></i> 
 					</button>
 					 </a>
 			
@@ -164,13 +164,13 @@
 				<form action='' method='post'>
 					{%csrf_token%}
 					<a class="tweet-footer-btn">
-					<button  type='submit' name ='unique' value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachpost.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+					<button type='button' class="likebutton" value={{eachpost.id}}  style='float:right;margin:0;background:none;border:none;'><span class="likenum">{{eachpost.likes}}</span> <i class="fas fa-heart" style="color:#DE1278;"></i>
 					</button>
 					</a>
 				</form>
 			</div>
 
-				<div class="modal fade" id="commentModal">
+				<div class="modal fade" id="commentModal-{{eachpost.id}}">
 				<div class="modal-dialog modal-dialog-centered" role="dialog">
 					<div class="modal-content">
 						<div class="modal-header" align="center">
@@ -208,16 +208,14 @@
 			</form> -->
 			
 
-			<form action='' method='post'>
-				{%csrf_token%}
-					<div class='input-field' align="center">
-						<input id={{eachpost.id}} type='text' name='sharecomment'>
-					</div>
-				<div align="center">
+			<div class='input-field' align="center">
+				<input id='{{eachpost.id}}-sharecomment' type='text' >
+			</div>
 
-				<button type='submit' name='share' value={{eachpost.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">Repost</i></button>
-				</div>
-			</form>
+			<div align="center">
+
+			<button type='button' name='share' value={{eachpost.id}} class="btn btn-outline-primary sharebutton"><i class="fas fa-retweet">Repost</i></button>
+			</div>
 
 			<!-- <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#retweetModal"><i class="fas fa-retweet">
 				RetweetModel test
@@ -269,7 +267,7 @@
 
 			<p align="center">Posted on <em>{{eachvideo.created_date}}</em></p>
 		
-			-<p align="center">{{eachvideo.text}}</p>
+			<div align="center" id="{{eachvideo.id}}-posttext" class="posttext">{{eachvideo.text|linebreaks}}</div>
 
 			{% if eachvideo.videoname %}
 			<video width="500" height="400" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
@@ -292,7 +290,7 @@
 
 			<div class="tweet-footer" align="center">
                 <a class="tweet-footer-btn">
-					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentModal"> <i class="fas fa-comment-alt"></i> 
+					<button type="button" class="btn btn-light" data-toggle="modal" data-target="#commentVideoModal-{{eachvideo.id}}"> <i class="fas fa-comment-alt"></i> 
 					</button>
 					 </a>
 			
@@ -305,13 +303,13 @@
 				<form action='' method='post'>
 					{%csrf_token%}
 					<a class="tweet-footer-btn">
-					<button  type='submit' name ='unique' value={{eachvideo.id}}  style='float:right;margin:0;background:none;border:none;'>{{eachvideo.likes}} <i class="fas fa-heart" style="color:#DE1278;"></i>
+					<button type='button' class="likebutton" value={{eachvideo.id}}  style='float:right;margin:0;background:none;border:none;'><span class="likenum">{{eachvideo.likes}}</span> <i class="fas fa-heart" style="color:#DE1278;"></i>
 					</button>
 					</a>
 				</form>
 			</div>
 
-				<div class="modal fade" id="commentModal">
+				<div class="modal fade" id="commentVideoModal-{{eachvideo.id}}">
 				<div class="modal-dialog modal-dialog-centered" role="dialog">
 					<div class="modal-content">
 						<div class="modal-header" align="center">
@@ -337,17 +335,15 @@
 					</div>
 				</div>
 				</div>
-				
-			<form action='' method='post'>
-				{%csrf_token%}
-					<div class='input-field' align="center">
-						<input id={{eachvideo.id}} type='text' name='sharecomment'>
-					</div>
+
+				<div class='input-field' align="center">
+					<input id='{{eachvideo.id}}-sharecomment' type='text' >
+				</div>
+
 				<div align="center">
 
-				<button type='submit' name='share' value={{eachvideo.id}} class="btn btn-outline-primary"><i class="fas fa-retweet">Repost</i></button>
+				<button type='button' name='share' value={{eachvideo.id}} class="btn btn-outline-primary sharebutton"><i class="fas fa-retweet">Repost</i></button>
 				</div>
-			</form>
 
 			{% endfor%}
 		</div>
@@ -382,5 +378,6 @@
 		</div>
 	</div>
 	</div>
+
 			{%endblock%}
 

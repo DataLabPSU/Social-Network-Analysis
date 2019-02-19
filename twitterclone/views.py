@@ -6,10 +6,114 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.http import JsonResponse
 import datetime
 import random, os
 
+updateLikeRequested = False
+def updatelike(request):
+	#block spam- one request at a time
+	global updateLikeRequested
+	if updateLikeRequested:
+		data = {}
+		updateLikeRequested = False
+		return JsonResponse(data)
+	else:
+		updateLikeRequested = True
+
+	postid = request.GET.get('postid')
+	user = User.objects.get(pk=request.user.id)
+	post = Post.objects.get(pk=postid)
+	try:
+		if post.author != user and postid not in user.profile.liked:
+			post.likes += 1
+			# append video labels to user labels
+			user.profile.labels = user.profile.labels + post.videolabels + "|"
+			post.updated = datetime.datetime.now()
+
+			if post.real == 0:
+				user.profile.fake = user.profile.fake + 1
+			else:
+				user.profile.real = user.profile.real + 1
+			user.profile.liked = user.profile.liked + " " + postid
+			post.save()
+			user.save()
+		elif post.author != user and postid in user.profile.liked:
+			temp = user.profile.liked.split(" ")
+			temp.remove(postid)
+			user.profile.liked = ' '.join(temp)
+
+			# remove first instance of post videolabels 
+			user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
+			
+			post.likes -= 1
+			if post.real == 0:
+				user.profile.fake = user.profile.fake - 1
+			else:
+				user.profile.real = user.profile.real - 1
+			post.save()
+			user.save()
+	except:
+		pass
+
+	data = {
+		'likes': post.likes
+	}
+	
+	# update flag to allow next request
+	updateLikeRequested = False
+
+	return JsonResponse(data)
+
+def sharepost(request):
+	try:
+		postid = request.GET.get('postid')
+		if not postid:
+			pass
+
+		post = Post.objects.get(id=postid)
+		if request.user != post.author and request.user.username not in post.text:
+			if request.GET.get('sharecomment') == '':
+				post.text = post.text + '\n' + 'Post shared by ' + request.user.username
+			else:
+				post.text = post.text + '\n' + 'Post shared by ' + request.user.username + ' with comment ' + request.GET.get('sharecomment')
+			
+			# newshare = Share.objects.create(shared=request.user)
+			# newshare.postid = postid 
+			# try:
+			#  	newshare.comment = request.POST['sharecomment']
+			# except Exception as e:
+			#  	print(str(e))
+			#  	pass
+
+			# newshare.save()
+			user = request.user
+			# add video labels to user for sharing
+			user.profile.labels = user.profile.labels + post.videolabels + "|" 
+			print(user.profile.labels)
+			if post.real == 0:
+				user.profile.fake = user.profile.fake + 1
+			else:
+				user.profile.real = user.profile.real + 1
+			user.save()
+			post.save()
+			for user in User.objects.all():
+				if request.user.username in user.profile.following.split(" "):
+					user.profile.notifications = user.profile.notifications + 1
+					user.profile.notificationsString += "Post shared by " + str(request.user) + " at " + str(datetime.datetime.now()) + "|"
+					user.save()
+
+	except Exception as e:
+		pass
+
+	data = {
+		'posttext': post.text
+	}
+	
+	return JsonResponse(data)
+
 def processdata(request):
+	print('test')
 	users = User.objects.all()
 	edgelist_format = '{userid} {followingid}'
 	labellist_format = '{userid} {label_x}'
@@ -33,43 +137,70 @@ def processdata(request):
 
 	with open(pedgelist_file, 'w') as edgefile:
 		for user in users:
-			following = user.profile.following
-			userid = (str)(user.id)
-			following = following.split(' ')
+			try:
+				following = user.profile.following
+				userid = (str)(user.id)
+				following = following.split(' ')
 
-			for follower in following:
-				followerid = (str)(users.get(username=follower).id)
-				edgefile.write(userid + ' ' + followerid + '\n')
+				for follower in following:
+					followerid = (str)(users.get(username=follower).id)
+					edgefile.write(userid + ' ' + followerid + '\n')
+			except:
+				pass	
 			#print(userid + ' ' + following)
 			#print(userid + ' ' + labels)
 			#print('\n\n')
 
 	with open(plabellist_file, 'w') as labelfile:
 		for user in users:
-			labels = user.profile.labels
-			if labels == "":
-				continue
+			try:
+				labels = user.profile.labels
+				userid = (str)(user.id)
+				if labels == "":
+					labelfile.write(userid + '\n')
+					continue
 
-			userid = (str)(user.id)
-			labels = labels.replace("|", ",")
-			labels = labels.split(",")
-			groupids = []
-			for label in labels:
-				if label and grouplist[label.strip()]:
-					groupids.append(grouplist[label.strip()])
-			gids = list(set(groupids))
-			labelline = userid + " " + " ".join(str(x) for x in gids)
-			labelfile.write(labelline + '\n')
+				
+				labels = labels.replace("|", ",")
+				labels = labels.split(",")
+				groupids = []
+				for label in labels:
+					if label and grouplist[label.strip()]:
+						groupids.append(grouplist[label.strip()])
+				gids = list(set(groupids))
+				labelline = userid + " " + " ".join(str(x) for x in gids)
+				labelfile.write(labelline + '\n')
+			except:
+				pass
 
 	return render(request,'twitterclone/agree.html')
 
-def deletevideos(request):
+# purges all data including users, posts, shares, comments
+def deletedata(request):
+	# delete all users except root and admin
+	if request.user == User.objects.get(username='root'):
+		deleteposts(request)
+		for user in User.objects.all():
+			if user.username in ['admin', 'root']:
+				user.profile.following = ''
+				user.profile.labels = ''
+				user.profile.real = 0
+				user.profile.fake = 0
+				user.save()
+				continue
+			user.delete()
+		
+	return redirect('home')
+
+# purges all posts, shares, comments
+def deleteposts(request):
 	# delete all videos and shares
 	if request.user == User.objects.get(username='root'):
 		Post.objects.filter().delete()
 		Share.objects.filter().delete()
 	return redirect('home')
 
+# adds videos
 def addvideos(request):
 	# add videos script
 	if request.user == User.objects.get(username='root'):  
@@ -105,7 +236,6 @@ def addvideos(request):
 				user = User.objects.get(username='admin')
 				temp = Post.objects.create(author=user)
 				temp.title = 'Video'
-				temp.text = 'This is a video'
 				temp.videoname = i
 
 				# fetch video id
@@ -184,37 +314,6 @@ def home(request):
 				pass
 
 			try:
-				postid = request.POST['share']
-				if not postid:
-					pass
-
-				post = Post.objects.get(id=postid)
-				if request.user != post.author:
-					newshare = Share.objects.create(shared=request.user)
-					newshare.postid = postid
-					try:
-						newshare.comment = request.POST['sharecomment']
-					except Exception as e:
-						print(str(e))
-						pass
-					newshare.save()
-					user = request.user
-					if post.real == 0:
-						user.profile.fake = user.profile.fake + 1
-					else:
-						user.profile.real = user.profile.real + 1
-					user.save()
-					for user in User.objects.all():
-						if request.user.username in user.profile.following.split(" "):
-							user.profile.notifications = user.profile.notifications + 1
-							user.profile.notificationsString += "Post shared by " + str(request.user) + " at " + str(datetime.datetime.now()) + "|"
-							user.save()
-
-			except Exception as e:
-				pass
-
-			try:
-
 				user = User.objects.get(pk=request.user.id)
 				temp = set(user.profile.following.split(" "))
 			 
@@ -224,41 +323,7 @@ def home(request):
 				user.save()
 			except:
 				pass
-			try:
-				user = User.objects.get(pk=request.user.id)
-				post = Post.objects.get(pk=request.POST['unique'])
-				if post.author != user and request.POST['unique'] not in user.profile.liked:
-					post.likes += 1
-
-					# append video labels to user labels
-					user.profile.labels = user.profile.labels + post.videolabels + "|"
-					print(user.profile.labels)
-					post.updated = datetime.datetime.now()
-					post.save()
-					if post.real == 0:
-						user.profile.fake = user.profile.fake + 1
-					else:
-						user.profile.real = user.profile.real + 1
-					user.profile.liked = user.profile.liked + " " + request.POST['unique']
-					user.save()
-
-				elif post.author != user and request.POST['unique'] in user.profile.liked:
-					temp = user.profile.liked.split(" ")
-					temp.remove(request.POST['unique'])
-					user.profile.liked = ' '.join(temp)
-
-					# remove first instance of post videolabels 
-					user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
-					print(user.profile.labels)
-					post.likes -= 1
-					if post.real == 0:
-						user.profile.fake = user.profile.fake - 1
-					else:
-						user.profile.real = user.profile.real - 1
-					post.save()
-					user.save()
-			except:
-				pass
+			
 			try:
 				comment = request.POST['placeholder']
 				if not comment:
@@ -281,46 +346,46 @@ def home(request):
 
 		posts = Post.objects.filter(author=request.user)
 		postlist = list(posts)
-		shares = Share.objects.filter(shared=request.user)
+		# shares = Share.objects.filter(shared=request.user)
 		
-		# append retweets to postlist
-		for z in shares:
-			content = Post.objects.get(id=z.postid)
-			if content.author.username == 'admin':
-				content.author.username = 'Retweeted by ' + z.shared.username
-			else:
-				content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
-			content.created_date = z.date
-			content.sharecomment = z.comment
+		# # append retweets to postlist
+		# for z in shares:
+		# 	content = Post.objects.get(id=z.postid)
+		# 	if content.author.username == 'admin':
+		# 		content.author.username = 'Retweeted by ' + z.shared.username
+		# 	else:
+		# 		content.author.username = content.author.username + ' Retweeted by ' + z.shared.username
+		# 	content.created_date = z.date
+		# 	content.sharecomment = z.comment
 
-			postlist.append(content)
+		# 	postlist.append(content)
 
 		comments = Comment.objects.all()
 
 		# following
-		if user.profile.following != "":
-			for i in set(user.profile.following.split(" ")):
-				if i != "":
+		# if user.profile.following != "":
+		# 	for i in set(user.profile.following.split(" ")):
+		# 		if i != "":
 
-					#skip appending admin posts
-					if i == "admin":
-						continue
+		# 			#skip appending admin posts
+		# 			if i == "admin":
+		# 				continue
 
-					following = User.objects.get(username=i)
+		# 			following = User.objects.get(username=i)
 
-					otherposts = Post.objects.filter(author=following)
-					posts = posts | otherposts
-					postlist.extend(list(otherposts))
-					sharedposts = Share.objects.filter(shared=following)
-					for z in sharedposts:
-						content = Post.objects.get(id=z.postid)
-						if content.author.username == "admin":
-							content.author.username =  'Shared by ' + z.shared.username
-						else:
-							content.author.username = content.author.username + ' Shared by ' + z.shared.username
-						content.created_date = z.date
-						content.sharecomment = z.comment
-						postlist.append(content)
+		# 			otherposts = Post.objects.filter(author=following)
+		# 			posts = posts | otherposts
+		# 			postlist.extend(list(otherposts))
+		# 			sharedposts = Share.objects.filter(shared=following)
+		# 			for z in sharedposts:
+		# 				content = Post.objects.get(id=z.postid)
+		# 				if content.author.username == "admin":
+		# 					content.author.username =  'Shared by ' + z.shared.username
+		# 				else:
+		# 					content.author.username = content.author.username + ' Shared by ' + z.shared.username
+		# 				content.created_date = z.date
+		# 				content.sharecomment = z.comment
+		# 				postlist.append(content)
 		notificationsString = request.user.profile.notificationsString.split("|")
 		userlist = User.objects.exclude(pk=request.user.id)
 		finaloutput = []
