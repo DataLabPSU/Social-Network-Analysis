@@ -113,39 +113,40 @@ def sharepost(request):
 	
 	return JsonResponse(data)
 
-def likepost(request, user, post):
-	try:
-		if post.author != user and postid not in user.profile.liked:
-			post.likes += 1
-			# append video labels to user labels
-			user.profile.labels = user.profile.labels + post.videolabels + "|"
-			post.updated = datetime.datetime.now()
+def likepost(request, userid, post):
+	user = User.objects.get(pk=userid)
+	postid = str(post.id)
 
-			if post.real == 0:
-				user.profile.fake = user.profile.fake + 1
-			else:
-				user.profile.real = user.profile.real + 1
-			user.profile.liked = user.profile.liked + " " + postid
-			post.save()
-			user.save()
-		elif post.author != user and postid in user.profile.liked:
-			temp = user.profile.liked.split(" ")
-			temp.remove(postid)
-			user.profile.liked = ' '.join(temp)
+	if postid not in user.profile.liked:
+		post.likes += 1
+		# append video labels to user labels
+		user.profile.labels = user.profile.labels + post.videolabels + "|"
+		post.updated = datetime.datetime.now()
 
-			# remove first instance of post videolabels 
-			user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
-			
-			post.likes -= 1
-			if post.real == 0:
-				user.profile.fake = user.profile.fake - 1
-			else:
-				user.profile.real = user.profile.real - 1
-			post.save()
-			user.save()
-	except:
-		pass
+		if post.real == 0:
+			user.profile.fake = user.profile.fake + 1
+		else:
+			user.profile.real = user.profile.real + 1
+		user.profile.liked = user.profile.liked + " " + postid
+		print('liked')
+		post.save()
+		user.save()
+	elif postid in user.profile.liked:
+		temp = user.profile.liked.split(" ")
+		temp.remove(postid)
+		user.profile.liked = ' '.join(temp)
 
+		# remove first instance of post videolabels 
+		user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
+		
+		post.likes -= 1
+		if post.real == 0:
+			user.profile.fake = user.profile.fake - 1
+		else:
+			user.profile.real = user.profile.real - 1
+		post.save()
+		user.save()
+	
 	return True
 
 def createusers(request):
@@ -161,7 +162,9 @@ def loadtest(request):
 	posts = Post.objects.all()
 	for user in users:
 		for post in posts:
-			likepost(request, user, post)
+			print('likepost ' + str(user.id) + ' ' + str(post.id))
+			likepost(request, user.id, post)
+
 	return render(request,'twitterclone/agree.html')
 
 def processdata(request):
