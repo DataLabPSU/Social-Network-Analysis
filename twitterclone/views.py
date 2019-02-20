@@ -172,23 +172,26 @@ def processdata(request):
 	edgelist_format = '{userid} {followingid}'
 	labellist_format = '{userid} {label_x}'
 	grouplist = {'Audioless': 0,
-				'International News' : 1,
-				'Domestic News' : 2,
-				'Political' : 3,
-				'Healthcare' : 4,
-				'Random' : 5,
-				'Face-altered' : 6,
-				'Fake' : 7,
-				'Advertisement' : 8,
-				'Sports' : 9,
-				'Movie' : 10,
-				'Education' : 11}
+					'International News' : 1,
+					'Domestic News' : 2,
+					'Political' : 3,
+					'Healthcare' : 4,
+					'Random' : 5,
+					'Face-altered' : 6,
+					'Fake' : 7,
+					'Advertisement' : 8,
+					'Sports' : 9,
+					'Movie' : 10,
+					'Education' : 11,
+	        'Business': 12,
+	        'Faked': 7}
 
 	pdatadir = 'postdata/'
 	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
 	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
 	pimpressions_file = pdatadir + 'impressions_' + timenow + '.txt'
+	pcredibility_file = pdatadir + 'credibility_' + timenow	+ '.txt'
 
 	# edgelist
 	# format: <userid> <following1>
@@ -252,6 +255,15 @@ def processdata(request):
 			except Exception as e:
 			 	print(str(e))
 			 	pass
+
+	with open(pcredibility_file, 'w') as credibilityfile:
+		for user in users:
+			try:
+				credibilityline = str(user.id) + ' ' + str(user.profile.credibilityscore)
+				credibilityfile.write(credibilityline + '\n')
+			except Exception as e:
+				print(str(e))
+				pass
 
 	return render(request,'twitterclone/agree.html')
 

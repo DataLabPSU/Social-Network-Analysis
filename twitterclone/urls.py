@@ -21,8 +21,8 @@ path('deletedata/', views.deletedata,name='deletedata'),
 path('resetuserdata/', views.resetuserdata,name='resetuserdata'),
 
 #loadtesting
-path('createusers/', views.createusers,name='createusers'),
-path('loadtest/', views.loadtest,name='loadtest')
+#path('createusers/', views.createusers,name='createusers'),
+#path('loadtest/', views.loadtest,name='loadtest')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 
