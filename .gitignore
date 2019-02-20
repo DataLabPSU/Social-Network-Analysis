@@ -10,3 +10,10 @@ __pycache__/
 *.mp4
 *.mov
 *.en.vtt
+
+#postdata
+postdata/*
+
+#backups
+*.tar.gz
+db.sqlite3.*

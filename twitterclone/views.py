@@ -68,23 +68,24 @@ def updatelike(request):
 def sharepost(request):
 	try:
 		postid = request.GET.get('postid')
+		sharecomment = request.GET.get('sharecomment')
 		if not postid:
 			pass
 
 		post = Post.objects.get(id=postid)
 		if request.user != post.author and request.user.username not in post.text:
-			if request.GET.get('sharecomment') == '':
+			if sharecomment == '':
 				post.text = post.text + '\n' + 'Post shared by ' + request.user.username
 			else:
-				post.text = post.text + '\n' + 'Post shared by ' + request.user.username + ' with comment ' + request.GET.get('sharecomment')
+				post.text = post.text + '\n' + 'Post shared by ' + request.user.username + ' with comment ' + sharecomment
 			
-			# newshare = Share.objects.create(shared=request.user)
-			# newshare.postid = postid 
-			# try:
-			#  	newshare.comment = request.POST['sharecomment']
-			# except Exception as e:
-			#  	print(str(e))
-			#  	pass
+			newshare = Share.objects.create(shared=request.user)
+			newshare.postid = postid 
+			try:
+			 	newshare.comment = sharecomment
+			except Exception as e:
+			 	print(str(e))
+			 	pass
 
 			# newshare.save()
 			user = request.user
@@ -112,29 +113,89 @@ def sharepost(request):
 	
 	return JsonResponse(data)
 
+def likepost(request, userid, post):
+	user = User.objects.get(pk=userid)
+	postid = str(post.id)
+
+	if postid not in user.profile.liked:
+		post.likes += 1
+		# append video labels to user labels
+		user.profile.labels = user.profile.labels + post.videolabels + "|"
+		post.updated = datetime.datetime.now()
+
+		if post.real == 0:
+			user.profile.fake = user.profile.fake + 1
+		else:
+			user.profile.real = user.profile.real + 1
+		user.profile.liked = user.profile.liked + " " + postid
+		print('liked')
+		post.save()
+		user.save()
+	elif postid in user.profile.liked:
+		temp = user.profile.liked.split(" ")
+		temp.remove(postid)
+		user.profile.liked = ' '.join(temp)
+
+		# remove first instance of post videolabels 
+		user.profile.labels = user.profile.labels.replace(post.videolabels + "|", "", 1)
+		
+		post.likes -= 1
+		if post.real == 0:
+			user.profile.fake = user.profile.fake - 1
+		else:
+			user.profile.real = user.profile.real - 1
+		post.save()
+		user.save()
+	
+	return True
+
+def createusers(request):
+	for i in range(0,501):
+		user = User.objects.create_user(username='user' + str(i),
+                                 email='',
+                                 password='glass' + str(i))
+
+	return render(request,'twitterclone/agree.html')
+
+def loadtest(request):
+	users = User.objects.all()
+	posts = Post.objects.all()
+	for user in users:
+		for post in posts:
+			print('likepost ' + str(user.id) + ' ' + str(post.id))
+			likepost(request, user.id, post)
+
+	return render(request,'twitterclone/agree.html')
+
 def processdata(request):
-	print('test')
 	users = User.objects.all()
 	edgelist_format = '{userid} {followingid}'
 	labellist_format = '{userid} {label_x}'
 	grouplist = {'Audioless': 0,
-				'International News' : 1,
-				'Domestic News' : 2,
-				'Political' : 3,
-				'Healthcare' : 4,
-				'Random' : 5,
-				'Face-altered' : 6,
-				'Fake' : 7,
-				'Advertisement' : 8,
-				'Sports' : 9,
-				'Movie' : 10,
-				'Education' : 11}
+					'International News' : 1,
+					'Domestic News' : 2,
+					'Political' : 3,
+					'Healthcare' : 4,
+					'Random' : 5,
+					'Face-altered' : 6,
+					'Fake' : 7,
+					'Advertisement' : 8,
+					'Sports' : 9,
+					'Movie' : 10,
+					'Education' : 11,
+	        'Business': 12,
+	        'Faked': 7}
 
 	pdatadir = 'postdata/'
 	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
 	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
+	pimpressions_file = pdatadir + 'impressions_' + timenow + '.txt'
+	pcredibility_file = pdatadir + 'credibility_' + timenow	+ '.txt'
 
+	# edgelist
+	# format: <userid> <following1>
+	#		  <userid> <following2>
 	with open(pedgelist_file, 'w') as edgefile:
 		for user in users:
 			try:
@@ -145,22 +206,24 @@ def processdata(request):
 				for follower in following:
 					followerid = (str)(users.get(username=follower).id)
 					edgefile.write(userid + ' ' + followerid + '\n')
-			except:
-				pass	
+			except Exception as e:
+			 	print(str(e))
+			 	pass	
 			#print(userid + ' ' + following)
 			#print(userid + ' ' + labels)
 			#print('\n\n')
 
+	# labellist
+	# format: <userid> <label1> <label2> <label3>
 	with open(plabellist_file, 'w') as labelfile:
 		for user in users:
 			try:
 				labels = user.profile.labels
-				userid = (str)(user.id)
+				userid = str(user.id)
 				if labels == "":
 					labelfile.write(userid + '\n')
 					continue
 
-				
 				labels = labels.replace("|", ",")
 				labels = labels.split(",")
 				groupids = []
@@ -170,22 +233,67 @@ def processdata(request):
 				gids = list(set(groupids))
 				labelline = userid + " " + " ".join(str(x) for x in gids)
 				labelfile.write(labelline + '\n')
-			except:
+			except Exception as e:
+			 	print(str(e))
+			 	pass
+
+	# followers, likes, shares list
+	# format: <userid> <following> <followers> <numlikes> <numshares>
+	with open(pimpressions_file, 'w') as impressionsfile:
+		for user in users:
+			try:
+				userid = str(user.id)
+				following = len(user.profile.following.split(" "))
+				followeenum = 0
+				for i in users:
+					if user.username in i.profile.following.split(" "):
+						followeenum += 1
+				numliked = len(user.profile.liked.split(" "))
+				numshares = Share.objects.filter(shared=user.id).count()
+				impressionsline = userid + ' ' + str(following) + ' ' + str(followeenum) + ' ' + str(numliked) + ' ' + str(numshares)
+				impressionsfile.write(impressionsline + '\n')
+			except Exception as e:
+			 	print(str(e))
+			 	pass
+
+	with open(pcredibility_file, 'w') as credibilityfile:
+		for user in users:
+			try:
+				credibilityline = str(user.id) + ' ' + str(user.profile.credibilityscore)
+				credibilityfile.write(credibilityline + '\n')
+			except Exception as e:
+				print(str(e))
 				pass
 
 	return render(request,'twitterclone/agree.html')
 
+# resets all user data for all users
+def resetuserdata(request):
+	# reset all user data except root and admin
+	if request.user == User.objects.get(username='admin'):
+		for user in User.objects.all():
+			user.profile.following = ''
+			user.profile.labels = ''
+			user.profile.real = 0
+			user.profile.fake = 0
+			user.profile.credibilityscore = 0.1
+			user.save()
+	
+	return redirect('home')
+
 # purges all data including users, posts, shares, comments
+# does not remove admin or root
 def deletedata(request):
 	# delete all users except root and admin
-	if request.user == User.objects.get(username='root'):
+	if request.user == User.objects.get(username='admin'):
 		deleteposts(request)
 		for user in User.objects.all():
-			if user.username in ['admin', 'root']:
+			if user.username in ['admin']:	#, 'root']:
 				user.profile.following = ''
 				user.profile.labels = ''
 				user.profile.real = 0
 				user.profile.fake = 0
+				user.profile.credibilityscore = 0.1
 				user.save()
 				continue
 			user.delete()
@@ -195,7 +303,7 @@ def deletedata(request):
 # purges all posts, shares, comments
 def deleteposts(request):
 	# delete all videos and shares
-	if request.user == User.objects.get(username='root'):
+	if request.user == User.objects.get(username='admin'):
 		Post.objects.filter().delete()
 		Share.objects.filter().delete()
 	return redirect('home')
@@ -203,7 +311,7 @@ def deleteposts(request):
 # adds videos
 def addvideos(request):
 	# add videos script
-	if request.user == User.objects.get(username='root'):  
+	if request.user == User.objects.get(username='admin'):  
 		os.chdir('media/videos/')
 		vids = os.listdir()
 		
@@ -288,18 +396,17 @@ def home(request):
 		temp.save()
 	'''
 	if request.user.is_authenticated:
-
 		for user in User.objects.all():
-			temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-			temp2 = 1 - abs(user.profile.credibilityscore)
+			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+			temp2 = 1 - 0.1
 			temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
    
 			d[user.username] = temp / (temp + temp2 * temp3)
-		 
+		 	
 			temp = User.objects.get(username=user.username)
 			temp.profile.credibilityscore = d[user.username]
-			#temp.profile.labels = ""
 			temp.save()
+		#print(d)
 
 		if request.method == 'POST':
 			try:

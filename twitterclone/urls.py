@@ -17,7 +17,12 @@ url(r'^ajax/sharepost/$', views.sharepost, name='sharepost'),
 path('processdata/', views.processdata,name='processdata'),
 path('deleteposts/', views.deleteposts,name='deleteposts'),
 path('addvideos/', views.addvideos,name='addvideos'),
-path('deletedata/', views.deletedata,name='deletedata')
+path('deletedata/', views.deletedata,name='deletedata'),
+path('resetuserdata/', views.resetuserdata,name='resetuserdata'),
+
+#loadtesting
+#path('createusers/', views.createusers,name='createusers'),
+#path('loadtest/', views.loadtest,name='loadtest')
 # path('follow/',views.testfollow,name='testfollow')
 ]
 
