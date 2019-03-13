@@ -202,10 +202,10 @@ def processdata(request):
 				following = user.profile.following
 				userid = (str)(user.id)
 				following = following.split(' ')
-
 				for follower in following:
-					followerid = (str)(users.get(username=follower).id)
-					edgefile.write(userid + ' ' + followerid + '\n')
+					if follower:
+						followerid = (str)(users.get(username=follower).id)
+						edgefile.write(userid + ' ' + followerid + '\n')
 			except Exception as e:
 			 	print(str(e))
 			 	pass	
@@ -281,6 +281,15 @@ def resetuserdata(request):
 	
 	return redirect('home')
 
+
+# purges all posts, shares, comments
+def deleteposts(request):
+	# delete all videos and shares
+	if request.user == User.objects.get(username='admin'):
+		Post.objects.filter().delete()
+		Share.objects.filter().delete()
+	return redirect('home')
+	
 # purges all data including users, posts, shares, comments
 # does not remove admin or root
 def deletedata(request):
@@ -300,18 +309,10 @@ def deletedata(request):
 		
 	return redirect('home')
 
-# purges all posts, shares, comments
-def deleteposts(request):
-	# delete all videos and shares
-	if request.user == User.objects.get(username='admin'):
-		Post.objects.filter().delete()
-		Share.objects.filter().delete()
-	return redirect('home')
-
 # adds videos
 def addvideos(request):
 	# add videos script
-	if request.user == User.objects.get(username='admin'):  
+	if request.user == User.objects.get(username='root2'):  
 		os.chdir('media/videos/')
 		vids = os.listdir()
 		
