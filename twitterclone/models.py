@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 import uuid
 # Create your models here.
+from embed_video.fields import EmbedVideoField
 
 
 class Message(models.Model):
@@ -19,6 +20,7 @@ class Post(models.Model):
 	author = models.ForeignKey(User, on_delete=models.CASCADE)
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	videoname = models.TextField(blank=True, null=True)
+	video = EmbedVideoField(blank=True, null=True)
 	videolabels = models.TextField(blank=True, null=False)
 	subtitles = models.TextField(blank=True,null=True)
 	title = models.CharField(max_length=100)

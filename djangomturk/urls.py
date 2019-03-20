@@ -24,6 +24,7 @@ from django.views.static import serve
 urlpatterns = [
     path("", include('django.contrib.auth.urls')),
     path("", include('twitterclone.urls')),
+    url(r'^tracking/', include('tracking.urls')),
 
     #serving static files in production
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
