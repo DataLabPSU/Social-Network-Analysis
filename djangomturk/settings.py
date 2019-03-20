@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'twitterclone',
     'tracking',
-    'embed_video',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',

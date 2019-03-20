@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
-import datetime, time
+import datetime
 import random, os, json
 
 updateLikeRequested = False
@@ -413,7 +413,6 @@ def home(request):
 	followerscount = {}
 
 	if request.user.is_authenticated:
-		start = time.time()
 		for user in User.objects.all():
 			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
 			temp2 = 1 - 0.1
@@ -429,8 +428,6 @@ def home(request):
 			temp.profile.credibilityscore = d[user.username]
 			temp.save()
 		#print(d)
-		end = time.time()
-		print(end - start)
 
 		if request.method == 'POST':
 			try:
