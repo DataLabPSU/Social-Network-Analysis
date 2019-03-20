@@ -8,9 +8,10 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 import datetime
-import random, os
+import random, os, json
 
 updateLikeRequested = False
+
 def updatelike(request):
 	#block spam- one request at a time
 	global updateLikeRequested
@@ -309,6 +310,32 @@ def deletedata(request):
 		
 	return redirect('home')
 
+# save youtube video ids to db
+def addvideoids(request):
+	with open('media/videos/video_ids.json') as f:
+		data = json.load(f)
+	for post in Post.objects.all():
+		try:
+			vidname = post.videoname
+			if vidname != '':
+				isFake = 'Fake' in vidname
+				vidnum = vidname[:-4].split('_')[1]
+
+				# real videos range from 31-60
+				if not isFake:
+					vidnum = str(int(vidnum) + 30)
+
+				if data[vidnum]:
+					post.video = data[vidnum]
+
+				post.save()
+			else:
+				post.video = ''
+				post.save()
+		except:
+			pass
+	return render(request,'twitterclone/agree.html')
+
 # adds videos
 def addvideos(request):
 	# add videos script
@@ -345,7 +372,7 @@ def addvideos(request):
 				user = User.objects.get(username='admin')
 				temp = Post.objects.create(author=user)
 				temp.title = 'Video'
-				temp.videoname = i
+				temp.video = 'https://www.youtube.com/watch?v=SwsJ6IjZFY8'
 
 				# fetch video id
 				videoid = i[:-3].split('_')[-1]
@@ -384,18 +411,7 @@ def home(request):
 	d = {}
 	print(request.POST)
 	followerscount = {}
-	'''
-	for user in User.objects.all():
-		temp = abs(user.profile.credibilityscore) * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-		temp2 = 1 - abs(user.profile.credibilityscore)
-		temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-   
-		d[user.username] = temp / (temp + temp2 * temp3)
-		 
-		temp = User.objects.get(username=user.username)
-		temp.profile.credibilityscore = d[user.username]
-		temp.save()
-	'''
+
 	if request.user.is_authenticated:
 		for user in User.objects.all():
 			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
@@ -404,6 +420,10 @@ def home(request):
    
 			d[user.username] = temp / (temp + temp2 * temp3)
 		 	
+		 	# skip if credibilityscore doesn't change
+			if user.profile.credibilityscore == d[user.username]:
+		 		continue
+
 			temp = User.objects.get(username=user.username)
 			temp.profile.credibilityscore = d[user.username]
 			temp.save()

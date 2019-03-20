@@ -14,6 +14,9 @@ __pycache__/
 #postdata
 postdata/*
 
+#django
+log.django
+
 #backups
 *.tar.gz
 db.sqlite3.*

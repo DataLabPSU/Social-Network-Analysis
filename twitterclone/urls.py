@@ -19,7 +19,7 @@ path('deleteposts/', views.deleteposts,name='deleteposts'),
 path('addvideos/', views.addvideos,name='addvideos'),
 path('deletedata/', views.deletedata,name='deletedata'),
 path('resetuserdata/', views.resetuserdata,name='resetuserdata'),
-
+path('addvideoids/', views.addvideoids, name='addvideoids'),
 #loadtesting
 #path('createusers/', views.createusers,name='createusers'),
 #path('loadtest/', views.loadtest,name='loadtest')

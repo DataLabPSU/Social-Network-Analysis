@@ -1,6 +1,7 @@
 {%extends './base_generic.html' %}
 {%block content%}
 {% load static %}
+
 <!-- Navigation bar -->
 <nav class="navbar border-bottom border-grey sticky-top navbar-expand-lg navbar-light" style="background-color: #fff;">
 	<div class="navbar-collapse collapse justify-content-between">
@@ -122,14 +123,9 @@
 		
 			<div align="center" id="{{eachpost.id}}-posttext" class="posttext">{{eachpost.text|linebreaks}}</div>
 
-			{% if eachpost.videoname %}
-			<video width="500" height="400" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
-				<source src="{{ MEDIA_URL }}/videos/{{eachpost.videoname}}" type="video/mp4">
-			
-			{% if eachpost.subtitles %}
-			<track label='English' kind='captions' srclang='en' src="{{ MEDIA_URL}}/videos/{{eachpost.subtitles}}" default>
-			{% endif %}
-			</video>
+			{% if eachpost.video %}
+
+			<div class="youtube" data-id="{{eachvideo.video}}" style="width: 500px; height: 400px; display:block; margin: 0 auto;"></div>
 
 			<br/>
 			{% endif %}
@@ -269,14 +265,9 @@
 		
 			<div align="center" id="{{eachvideo.id}}-posttext" class="posttext">{{eachvideo.text|linebreaks}}</div>
 
-			{% if eachvideo.videoname %}
-			<video width="500" height="400" style="display:block; margin: 0 auto;" controls controlsList="nodownload nofullscreen">
-				<source src="{{ MEDIA_URL }}/videos/{{eachvideo.videoname}}" type="video/mp4">
-			
-			{% if eachvideo.subtitles %}
-			<track label='English' kind='captions' srclang='en' src="{{ MEDIA_URL}}/videos/{{eachvideo.subtitles}}" default>
-			{% endif %}
-			</video>
+			{% if eachvideo.video %}
+
+			<div class="youtube" data-id="{{eachvideo.video}}" style="width: 500px; height: 400px; display:block; margin: 0 auto;"></div>
 
 			<br/>
 			{% endif %}
