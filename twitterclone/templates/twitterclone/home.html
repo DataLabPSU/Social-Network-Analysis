@@ -35,6 +35,7 @@
       	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 					
 						<a class="dropdown-item" href="settings/">Settings</a>
+
 					</div>
 				</div>
 				 <form class="navbar-form" role="search">
@@ -43,6 +44,7 @@
         			</div>
      			 	</div>
     				</form>
+    			<a class="btn" href="/logout/">Logout</a>
 				<a class = "btn btn-search-bar" href="/final/" role="button">Code for mturk </a>
 				<a class="btn btn-search-bar" href="/create/" role="button">Post</a>
 			</ul>
@@ -125,7 +127,7 @@
 
 			{% if eachpost.video %}
 
-			<div class="youtube" data-id="{{eachvideo.video}}" style="width: 500px; height: 400px; display:block; margin: 0 auto;"></div>
+			<div class="youtube" data-id="{{eachpost.video}}" style="width: 500px; height: 400px; display:block; margin: 0 auto;"></div>
 
 			<br/>
 			{% endif %}
