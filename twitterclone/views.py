@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
+from django.utils.timezone import make_aware
 import datetime
 import random, os, json
 
@@ -30,7 +31,7 @@ def updatelike(request):
 			post.likes += 1
 			# append video labels to user labels
 			user.profile.labels = user.profile.labels + post.videolabels + "|"
-			post.updated = datetime.datetime.now()
+			post.updated = make_aware(datetime.datetime.now())
 
 			if post.real == 0:
 				user.profile.fake = user.profile.fake + 1
@@ -122,7 +123,7 @@ def likepost(request, userid, post):
 		post.likes += 1
 		# append video labels to user labels
 		user.profile.labels = user.profile.labels + post.videolabels + "|"
-		post.updated = datetime.datetime.now()
+		post.updated = make_aware(datetime.datetime.now())
 
 		if post.real == 0:
 			user.profile.fake = user.profile.fake + 1
@@ -461,7 +462,7 @@ def home(request):
 				newcomment.post = Post.objects.get(pk=request.POST['submit'])
 				newcomment.text = comment
 				temp = Post.objects.get(pk=request.POST['submit'])
-				temp.updated = datetime.datetime.now()
+				temp.updated = make_aware(datetime.datetime.now())
 				temp.save()
 				newcomment.save()
 				for user in User.objects.all():
