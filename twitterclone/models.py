@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from django.contrib.auth.signals import user_logged_in
 import uuid
 
 
@@ -75,14 +74,6 @@ class Profile(models.Model):
 	real = models.IntegerField(default=0)
 	imagename = models.TextField(default='image0.jpeg')
 	amazonid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
-	login_count = models.PositiveIntegerField(default=0)
-
-
-def login_user(sender, request, user, **kwargs):
-    user.profile.login_count = user.profile.login_count + 1
-    user.profile.save()
-
-user_logged_in.connect(login_user)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

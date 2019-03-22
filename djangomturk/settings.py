@@ -125,6 +125,13 @@ LOGGING = {
     },
 }
 
+LOGIN_URL = '/login'
+
+# Session- update on request, expire after 1hr
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 6000
+SESSION_SAVE_EVERY_REQUEST = True
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
