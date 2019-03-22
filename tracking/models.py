@@ -35,6 +35,7 @@ class Visitor(models.Model):
         editable=False,
         on_delete=models.CASCADE,
     )
+
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
     user_agent = models.TextField(null=True, editable=False)
