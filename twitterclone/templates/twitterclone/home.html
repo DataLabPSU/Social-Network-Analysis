@@ -15,9 +15,11 @@
     			</li>
     			
     			<li>
-    				<a class="nav-link" href="/instructions/"><i class="fas fa-bell" style="color:#8CCEF9;"></i> Instructions</a>
+    				<a class="nav-link" href="/instructions/"><i class="fas fa-info" style="color:#8CCEF9;"></i> Instructions</a>
 
     			</li>
+    			
+    			<button id="referral" type="button" class="btn btn-sm btn-follow" data-toggle="popover" title="Share your referral link" data-content="Share the following link <a href='#'>https://socialnetdata.org/signup/?referral={{request.user.profile.amazonid}}</a> with your friends for a chance to win a prize!"><i class="fas fa-bullhorn"></i> Refer</button>
     
     	</ul>
     	<div>
@@ -44,6 +46,7 @@
         			</div>
      			 	</div>
     				</form>
+
     			<a class="btn" href="/logout/">Logout</a>
 				<a class = "btn btn-search-bar" href="/final/" role="button">Code for mturk </a>
 				<a class="btn btn-search-bar" href="/create/" role="button">Post</a>

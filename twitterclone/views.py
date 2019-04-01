@@ -373,7 +373,7 @@ def addvideos(request):
 				user = User.objects.get(username='admin')
 				temp = Post.objects.create(author=user)
 				temp.title = 'Video'
-				temp.video = 'https://www.youtube.com/watch?v=SwsJ6IjZFY8'
+				temp.video = ''
 
 				# fetch video id
 				videoid = i[:-3].split('_')[-1]
@@ -582,16 +582,21 @@ def home(request):
 
 def signup(request):
 	if request.method == 'POST':
-		form = UserCreationForm(request.POST)
+		form = forms.UserCreationForm(request.POST)
 		if form.is_valid():
 			form.save()
 			username = form.cleaned_data.get('username')
 			raw_password = form.cleaned_data.get('password1')
 			user = authenticate(username=username, password=raw_password)
 			login(request, user)
-			return redirect('login')
+			return redirect('home')
 	else:
-		form = UserCreationForm()
+		if request.GET:
+			test_form = forms.UserCreationForm(data=request.GET)
+			test_form.is_valid()
+			form = forms.UserCreationForm(initial=test_form.cleaned_data)
+		else:
+			form = forms.UserCreationForm()
 	return render(request, 'twitterclone/signup.html', {'form': form})
 
 def instructions(request):
