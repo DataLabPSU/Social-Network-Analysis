@@ -62,7 +62,7 @@ class Comment(models.Model):
 	created_date = models.DateTimeField(default=timezone.now)
 
 class Profile(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 	bio = models.TextField(max_length=500, blank=True)
 	following = models.TextField(max_length=1000, default='')
 	liked = models.TextField(max_length=1000, blank=True)
@@ -73,12 +73,16 @@ class Profile(models.Model):
 	fake = models.IntegerField(default=0)
 	real = models.IntegerField(default=0)
 	imagename = models.TextField(default='image0.jpeg')
+	referral = models.UUIDField(blank=True, null=True, primary_key=False, default=None, editable=False)
 	amazonid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
 	if created:
-		Profile.objects.create(user=instance)
+		if instance.referral:
+			Profile.objects.create(user=instance, referral=instance.referral)
+		else:
+			Profile.objects.create(user=instance)
 
 
 @receiver(post_save, sender=User)
