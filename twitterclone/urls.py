@@ -14,12 +14,28 @@ path('instructions/',views.instructions,name='instructions'),
 path('final/',views.survey,name='survey'),
 url(r'^ajax/updatelike/$', views.updatelike, name='updatelike'),
 url(r'^ajax/sharepost/$', views.sharepost, name='sharepost'),
+
+# dumps data
 path('processdata/', views.processdata,name='processdata'),
+
+# deletes all posts excluding videos
 path('deleteposts/', views.deleteposts,name='deleteposts'),
+
+# adds new videos
 path('addvideos/', views.addvideos,name='addvideos'),
-path('deletedata/', views.deletedata,name='deletedata'),
+
+# deletes all users except admin 
+path('deleteusers/', views.deleteusers,name='deleteusers'),
+
+# resets user information
 path('resetuserdata/', views.resetuserdata,name='resetuserdata'),
+
+# resets video info
+path('resetvideos/', views.resetvideos,name='resetvideos'),
+
+# adds youtube video ids to existing videos
 path('addvideoids/', views.addvideoids, name='addvideoids'),
+
 #loadtesting
 #path('createusers/', views.createusers,name='createusers'),
 #path('loadtest/', views.loadtest,name='loadtest')

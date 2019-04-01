@@ -286,20 +286,29 @@ def resetuserdata(request):
 
 # purges all posts, shares, comments
 def deleteposts(request):
-	# delete all videos and shares
+	# delete all posts except for videos
 	if request.user == User.objects.get(username='admin'):
-		Post.objects.filter().delete()
+		Post.objects.filter(video=None).delete()
 		Share.objects.filter().delete()
 	return redirect('home')
 	
-# purges all data including users, posts, shares, comments
-# does not remove admin or root
-def deletedata(request):
+# resets all videos data
+def resetvideos(request):
+	if request.user == User.objects.get(username='admin'):
+		for post in Post.objects.all():
+			post.likes = 0
+			post.created_date = make_aware(datetime.datetime.now())
+			post.updated = make_aware(datetime.datetime.now())
+			post.text = ''
+			post.save()
+	return redirect('home')
+
+# resets all users except admin
+def deleteusers(request):
 	# delete all users except root and admin
 	if request.user == User.objects.get(username='admin'):
-		deleteposts(request)
 		for user in User.objects.all():
-			if user.username in ['admin']:	#, 'root']:
+			if user.username in ['admin']:
 				user.profile.following = ''
 				user.profile.labels = ''
 				user.profile.real = 0
