@@ -14,7 +14,7 @@ class UserCreationForm(UserCreationForm):
 	def clean_referral(self):
 		referral = self.cleaned_data["referral"].replace('-', '')
 		if referral != '' and not validate_uuid4(referral):
-			raise forms.ValidationError('Invalid referral code, please verify the referral is a valid Amazon MTURK Code')
+			raise forms.ValidationError('Invalid referral code, please verify the referral code is valid')
 
 		return referral
 
