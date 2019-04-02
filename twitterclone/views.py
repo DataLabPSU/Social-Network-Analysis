@@ -8,6 +8,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 from django.utils.timezone import make_aware
+from django.conf import settings
 import datetime
 import random, os, json
 
@@ -671,7 +672,7 @@ def pick(request):
 		user.profile.imagename = request.POST['hidden']
 		user.save()
 		return redirect('home')
-	os.chdir('media/images/')
+	os.chdir(settings.MEDIA_ROOT + '/images/')
 	images = [i for i in os.listdir()[:15]]
 	images = [i for i in images if i[-3:] != 'jpg']
 	context = {
