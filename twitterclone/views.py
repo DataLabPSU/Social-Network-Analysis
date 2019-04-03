@@ -12,8 +12,24 @@ from django.conf import settings
 import datetime
 import random, os, json
 
-updateLikeRequested = False
 
+def updateCredibilityScore(request):
+	for user in User.objects.all():
+		temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+		temp2 = 1 - 0.1
+		temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+
+		d[user.username] = temp / (temp + temp2 * temp3)
+	 	
+	 	# skip if credibilityscore doesn't change
+		if user.profile.credibilityscore == d[user.username]:
+	 		continue
+
+		temp = User.objects.get(username=user.username)
+		temp.profile.credibilityscore = d[user.username]
+		temp.save()
+
+updateLikeRequested = False
 def updatelike(request):
 	#block spam- one request at a time
 	global updateLikeRequested
@@ -424,22 +440,21 @@ def home(request):
 	followerscount = {}
 
 	if request.user.is_authenticated:
-		# for user in User.objects.all():
-		# 	temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-		# 	temp2 = 1 - 0.1
-		# 	temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-   
-		# 	d[user.username] = temp / (temp + temp2 * temp3)
+		for user in User.objects.all():
+			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+			temp2 = 1 - 0.1
+			temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+
+			d[user.username] = temp / (temp + temp2 * temp3)
 		 	
-		#  	# skip if credibilityscore doesn't change
-		# 	if user.profile.credibilityscore == d[user.username]:
-		#  		continue
+		 	# skip if credibilityscore doesn't change
+			if user.profile.credibilityscore == d[user.username]:
+		 		continue
 
-		# 	temp = User.objects.get(username=user.username)
-		# 	temp.profile.credibilityscore = d[user.username]
-		# 	temp.save()
-		#print(d)
-
+			temp = User.objects.get(username=user.username)
+			temp.profile.credibilityscore = d[user.username]
+			temp.save()
+		
 		if request.method == 'POST':
 			try:
 				follow = request.POST['follows']
