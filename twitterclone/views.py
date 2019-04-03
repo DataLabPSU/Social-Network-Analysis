@@ -14,6 +14,7 @@ import random, os, json
 
 
 def updateCredibilityScore(request):
+	d = {}
 	for user in User.objects.all():
 		temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
 		temp2 = 1 - 0.1
