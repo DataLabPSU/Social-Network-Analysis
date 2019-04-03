@@ -424,20 +424,20 @@ def home(request):
 	followerscount = {}
 
 	if request.user.is_authenticated:
-		for user in User.objects.all():
-			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-			temp2 = 1 - 0.1
-			temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+		# for user in User.objects.all():
+		# 	temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+		# 	temp2 = 1 - 0.1
+		# 	temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
    
-			d[user.username] = temp / (temp + temp2 * temp3)
+		# 	d[user.username] = temp / (temp + temp2 * temp3)
 		 	
-		 	# skip if credibilityscore doesn't change
-			if user.profile.credibilityscore == d[user.username]:
-		 		continue
+		#  	# skip if credibilityscore doesn't change
+		# 	if user.profile.credibilityscore == d[user.username]:
+		#  		continue
 
-			temp = User.objects.get(username=user.username)
-			temp.profile.credibilityscore = d[user.username]
-			temp.save()
+		# 	temp = User.objects.get(username=user.username)
+		# 	temp.profile.credibilityscore = d[user.username]
+		# 	temp.save()
 		#print(d)
 
 		if request.method == 'POST':
@@ -563,7 +563,7 @@ def home(request):
 		for i in User.objects.all():
 			if request.user.username in i.profile.following.split(" "):
 				followeenum += 1
-		print(finaloutput)
+		#print(finaloutput)
 		for i in finaloutput:
 			if i[0] in following:
 				finaloutput.remove([i[0],i[1]])
