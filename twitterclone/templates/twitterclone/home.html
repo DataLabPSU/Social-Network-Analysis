@@ -134,10 +134,8 @@
 
 			<br/>
 			{% endif %}
-			{% for comment in comments%}
-			{% if comment.post == eachpost%}
-			<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
-			{% endif %}
+			{% for comment in eachpost.comments%}
+				<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
 			{% endfor%}
 
 			<!-- <form class = '' method='post'>
@@ -276,10 +274,9 @@
 
 			<br/>
 			{% endif %}
-			{% for comment in comments%}
-			{% if comment.post == eachvideo%}
-			<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
-			{% endif %}
+
+			{% for comment in eachvideo.comments%}
+				<p align="center"><strong>Comment by @{{comment.author}}:</strong> {{comment.text}}</p>
 			{% endfor%}
 
 

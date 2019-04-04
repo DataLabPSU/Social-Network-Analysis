@@ -9,11 +9,30 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 from django.utils.timezone import make_aware
 from django.conf import settings
-import datetime
+from django.template.defaulttags import register
+
+import datetime, time
 import random, os, json
 
-updateLikeRequested = False
 
+def updateCredibilityScore(request):
+	d = {}
+	for user in User.objects.all():
+		temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+		temp2 = 1 - 0.1
+		temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
+
+		d[user.username] = temp / (temp + temp2 * temp3)
+	 	
+	 	# skip if credibilityscore doesn't change
+		if user.profile.credibilityscore == d[user.username]:
+	 		continue
+
+		temp = User.objects.get(username=user.username)
+		temp.profile.credibilityscore = d[user.username]
+		temp.save()
+
+updateLikeRequested = False
 def updatelike(request):
 	#block spam- one request at a time
 	global updateLikeRequested
@@ -189,7 +208,7 @@ def processdata(request):
 	        'Business': 12,
 	        'Faked': 7}
 
-	pdatadir = 'postdata/'
+	pdatadir =  settings.BASE_DIR + '/postdata/'
 	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
 	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
@@ -259,6 +278,7 @@ def processdata(request):
 			 	print(str(e))
 			 	pass
 
+	updateCredibilityScore(request)
 	with open(pcredibility_file, 'w') as credibilityfile:
 		for user in users:
 			try:
@@ -423,23 +443,7 @@ def home(request):
 	print(request.POST)
 	followerscount = {}
 
-	if request.user.is_authenticated:
-		for user in User.objects.all():
-			temp = 0.1 * (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-			temp2 = 1 - 0.1
-			temp3 = 1 - (user.profile.real + 1) / (user.profile.real + user.profile.fake + 2)
-   
-			d[user.username] = temp / (temp + temp2 * temp3)
-		 	
-		 	# skip if credibilityscore doesn't change
-			if user.profile.credibilityscore == d[user.username]:
-		 		continue
-
-			temp = User.objects.get(username=user.username)
-			temp.profile.credibilityscore = d[user.username]
-			temp.save()
-		#print(d)
-
+	if request.user.is_authenticated:		
 		if request.method == 'POST':
 			try:
 				follow = request.POST['follows']
@@ -483,8 +487,14 @@ def home(request):
 				pass
 		user = User.objects.get(pk=request.user.id)
 
-		posts = Post.objects.filter(author=request.user)
-		postlist = list(posts)
+		if request.user.username == 'admin':
+			postlist = []
+		else:
+			posts = Post.objects.filter(author=request.user)
+			for post in posts:
+				post.comments = Comment.objects.filter(post=post.id).order_by('-created_date')[:30]
+			postlist = list(posts)
+		# print(time.time()-start_time)
 		# shares = Share.objects.filter(shared=request.user)
 		
 		# # append retweets to postlist
@@ -498,8 +508,6 @@ def home(request):
 		# 	content.sharecomment = z.comment
 
 		# 	postlist.append(content)
-
-		comments = Comment.objects.all()
 
 		# following
 		# if user.profile.following != "":
@@ -534,6 +542,10 @@ def home(request):
 		postlist.sort(key=lambda r:r.updated,reverse=True) 
 		#print(postlist)
 
+		# start_time = time.time()
+		# updateCredibilityScore(request)
+		# print(time.time() - start_time)
+		# start_time = time.time()
 
 		for i in User.objects.all():
 			# skip admins
@@ -545,6 +557,8 @@ def home(request):
 				   dictionary[z] += 1
 				except:
 				   dictionary[z] = 1
+		# print(time.time() - start_time)
+		# start_time = time.time()
 		for i in temp:
 			#skip admin
 			if i.user.username == 'admin':
@@ -555,7 +569,9 @@ def home(request):
 				 try:
 				   finaloutput.append([i.user,dictionary[i.user.username]])
 				 except:
-				   finaloutput.append([i.user,0])              
+				   finaloutput.append([i.user,0])   
+		# print(time.time() - start_time)
+		# start_time = time.time()
 		following = []
 		for i in set(user.profile.following.split(" ")[1:]):
 			following.append(User.objects.get(username=i))
@@ -563,18 +579,23 @@ def home(request):
 		for i in User.objects.all():
 			if request.user.username in i.profile.following.split(" "):
 				followeenum += 1
-		print(finaloutput)
+		# print(time.time() - start_time)
+		# start_time = time.time()
+		#print(finaloutput)
 		for i in finaloutput:
 			if i[0] in following:
 				finaloutput.remove([i[0],i[1]])
-		
+		# print(time.time() - start_time)
+		start_time = time.time()
 		mainvids = Post.objects.filter(author=User.objects.get(username='admin'))
+		for mainvid in mainvids:
+			mainvid.comments = Comment.objects.filter(post=mainvid.id).order_by('-created_date')[:30]
+		# print(time.time()-start_time)
+
 		context = {
 			'mainvids': mainvids,
 			'posts': postlist,
-			'comments': comments,
 			'FOLLOWING': following,
-			'test': (user.profile.following.split(" ")),
 			'currentuser': request.user,
 			'notifications': notificationsString,
 			'users': userlist,
@@ -583,7 +604,7 @@ def home(request):
 			'curfolloweesnum': followeenum,
 			'image': request.user.profile.imagename
 		}
-
+		
 		return render(request, "twitterclone/home.html", context)
 	else:
 		# send to consent form if not logged in

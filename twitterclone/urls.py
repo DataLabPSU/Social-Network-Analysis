@@ -36,6 +36,9 @@ path('resetvideos/', views.resetvideos,name='resetvideos'),
 # adds youtube video ids to existing videos
 path('addvideoids/', views.addvideoids, name='addvideoids'),
 
+# update credibility score
+path('updatecred/', views.updateCredibilityScore, name='updatecred'),
+
 #loadtesting
 #path('createusers/', views.createusers,name='createusers'),
 #path('loadtest/', views.loadtest,name='loadtest')
