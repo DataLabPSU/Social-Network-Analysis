@@ -208,7 +208,7 @@ def processdata(request):
 	        'Business': 12,
 	        'Faked': 7}
 
-	pdatadir =  settings.BASE_DIR + 'postdata/'
+	pdatadir =  settings.BASE_DIR + '/postdata/'
 	timenow =  datetime.datetime.now().strftime("%Y%m%d-%H_%M_%S")
 	pedgelist_file = pdatadir + 'edgelist_' + timenow + '.txt'
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
