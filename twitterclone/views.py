@@ -491,7 +491,10 @@ def home(request):
 			postlist = []
 		else:
 			posts = Post.objects.filter(author=request.user)
+			for post in posts:
+				post.comments = Comment.objects.filter(post=post.id).order_by('-created_date')[:30]
 			postlist = list(posts)
+		# print(time.time()-start_time)
 		# shares = Share.objects.filter(shared=request.user)
 		
 		# # append retweets to postlist
