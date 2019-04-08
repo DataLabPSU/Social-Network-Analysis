@@ -214,7 +214,7 @@ def processdata(request):
 	plabellist_file = pdatadir + 'labellist_' + timenow + '.txt'
 	pimpressions_file = pdatadir + 'impressions_' + timenow + '.txt'
 	pcredibility_file = pdatadir + 'credibility_' + timenow	+ '.txt'
-
+	plikes_file = pdatadir + 'likes_' + timenow	+ '.txt'
 	# edgelist
 	# format: <userid> <following1>
 	#		  <userid> <following2>
@@ -223,6 +223,10 @@ def processdata(request):
 			try:
 				following = user.profile.following
 				userid = (str)(user.id)
+				#edgefile.write(userid + ' 0\n')
+				if following == '':
+					edgefile.write(userid + ' ' + userid + '\n')
+
 				following = following.split(' ')
 				for follower in following:
 					if follower:
@@ -284,6 +288,15 @@ def processdata(request):
 			try:
 				credibilityline = str(user.id) + ' ' + str(user.profile.credibilityscore)
 				credibilityfile.write(credibilityline + '\n')
+			except Exception as e:
+				print(str(e))
+				pass
+
+	with open(plikes_file, 'w') as likesfile:
+		for user in users:
+			try:
+				likesline = str(user.id) + ' ' + str(user.profile.real) + ' ' + str(user.profile.fake)
+				likesfile.write(likesline + '\n')
 			except Exception as e:
 				print(str(e))
 				pass
