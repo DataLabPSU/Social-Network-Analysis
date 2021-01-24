@@ -11,7 +11,7 @@ import pandas as pd
 import pickle
 import json
 
-folder_name = "PNAS_Data"
+folder_name = "Data"
 folder_dir = os.getcwd() + "/" + folder_name + "/"
 
 credibility_list = []
