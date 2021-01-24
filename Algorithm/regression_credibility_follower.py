@@ -4,9 +4,9 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 
-df11 = pd.read_csv("PNAS_Data/impressionsnew20190405010722.txt", sep=" ", header=None)
-df22 = pd.read_csv("PNAS_Data/credibilitynew20190405010722.txt", sep=" ", header=None)
-df2 = pd.read_csv("PNAS_Data/followerlistnew20190405010722.txt",sep=" ", header=None)
+df11 = pd.read_csv("Data/impressionsnew20190405010722.txt", sep=" ", header=None)
+df22 = pd.read_csv("Data/credibilitynew20190405010722.txt", sep=" ", header=None)
+df2 = pd.read_csv("Data/followerlistnew20190405010722.txt",sep=" ", header=None)
 followersonlylist = []
 for i in df2[0]:
     followersonlylist.append(i)
