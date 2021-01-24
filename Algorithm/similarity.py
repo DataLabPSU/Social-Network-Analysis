@@ -10,7 +10,7 @@ import os
 import time
 import math
 
-folder_name = "PNAS_Data"
+folder_name = "Data"
 folder_dir = os.getcwd() + "/" + folder_name + "/"
 
 def createFolder(directory):
